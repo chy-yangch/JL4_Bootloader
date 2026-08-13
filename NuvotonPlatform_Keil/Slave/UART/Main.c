@@ -10,13 +10,9 @@
 #include "clk.h"
 #include "timer.h"
 
-
-volatile uint8_t JL3PR = 1, JL3RH = 2, JL3PC = 3, JL3VU = 4;
-
-/*  #define MODE JL3PR */ 
-#define MODE JL3RH
-/*  #define MODE JL3PC */ 
-/* #define MODE JL3VU */
+#define JL4RH
+//#define JL4PR
+//#define JL4PC
 
 #define USING_AUTODETECT
 
@@ -487,115 +483,74 @@ int32_t main()
 	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
 	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN;
 
-	if (MODE == JL3PR) {
-		PA->DOUT = 0x00000000;
-		SYS->PA_H_MFP =	0x00000000;
-		SYS->PA_L_MFP =	0x00001200;
-		PA->PMD = 0x00000005;
-		PA->OFFD = 0x00070000;
-		PA->PUEN = 0x00000000;
-		PA->DBEN = 0x00000008;
-	} else if (MODE == JL3RH) {
-		PA->DOUT = 0x00000000;
-		SYS->PA_H_MFP =	0x00000000;
-		SYS->PA_L_MFP =	0x00001200;
-		PA->PMD =  0x00000005;
-		PA->OFFD = 0x00070000;
-		PA->PUEN = 0x00000000;
-		PA->DBEN = 0x00000008;
-
-	} else if (MODE == JL3PC) {
-		PA->DOUT = 0x00000000;
-		SYS->PA_H_MFP =	0x00000000;
-		SYS->PA_L_MFP =	0x00001222;
-		PA->PMD = 0x00000005;
-		PA->OFFD = 0x00070000;
-		PA->PUEN = 0x00000000;
-		PA->DBEN = 0x00000008;
-	} else { /* JL3VU */
-		PA->DOUT = 0x00000000;
-		SYS->PA_H_MFP =	0x00000000;
-		SYS->PA_L_MFP =	0x00200000;
-		PA->PMD =  0x00000000;
-		PA->OFFD = 0x00000000;
-		PA->PUEN = 0x00000000;
-		PA->DBEN = 0x00000000;
-
-	}
-
-	SYS->PB_H_MFP = 0x07700000;
-	if (MODE == JL3VU) {
-		PB->PMD =  0x51555555;
-		PB->DOUT = 0x00008000;
-	} else {
-		PB->PMD =  0x11000000;
-		PB->DOUT = 0x00001000;
-	}
+    #if defined(JL4PR)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP =	0x00000000;
+	SYS->PA_L_MFP =	0x00001200;
+	PA->PMD = 0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000000;//0x70000000;
+	PC->PMD  = 0x10015100;//0x10015100;//0x10001500;0x15511151
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000200;	
+	
+    #elif defined(JL4RH)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP =	0x00000000;
+	SYS->PA_L_MFP =	0x00001200;
+	PA->PMD =  0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000000;//0x70000000;
+	PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000000;
+		
+    #elif defined(JL4PC)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP =	0x00000000;
+	SYS->PA_L_MFP =	0x00001222;
+	PA->PMD = 0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000003;//0x70000003;
+	PC->PMD  = 0x10015501;//0x10001501;
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000000;
+		
+    #else
+	__NOP();
+	__NOP();
+    #endif
+	
 	PB->OFFD = 0x00000000;
 	PB->PUEN = 0x00000000;
 
-
-
-
-	if (MODE == JL3PR) {
-		PC->DOUT = 0x00004000;//0x00000050;
-		SYS->PC_H_MFP = 0x00000000;//0x00000007;
-		SYS->PC_L_MFP = 0x00000000;//0x70000000;
-		PC->PMD  = 0x10015100;//0x10015100;//0x10001500;0x15511151
-		PC->OFFD = 0x00000000;
-		PC->PUEN = 0x00000200;
-	} else if (MODE == JL3RH) {
-		PC->DOUT = 0x00004000;//0x00000050;
-		SYS->PC_H_MFP = 0x00000000;//0x00000007;
-		SYS->PC_L_MFP = 0x00000000;//0x70000000;
-		PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
-		PC->OFFD = 0x00000000;
-		PC->PUEN = 0x00000000;
-
-
-	} else if (MODE == JL3PC) {
-		PC->DOUT = 0x00004000;//0x00000050;
-		SYS->PC_H_MFP = 0x00000000;//0x00000007;
-		SYS->PC_L_MFP = 0x00000003;//0x70000003;
-		PC->PMD  = 0x10015501;//0x10001501;
-		PC->OFFD = 0x00000000;
-		PC->PUEN = 0x00000000;
-
-	} else { //JL3VU
-		PC->DOUT = 0x00002040;
-		SYS->PC_H_MFP = 0x00000007;
-		SYS->PC_L_MFP = 0x70000000;
-		PC->PMD  = 0x15551455;
-		PC->OFFD = 0x00000000;
-		PC->PUEN = 0x00000000;
-
-	}
-
 	PD->DOUT = 0x00000000;
-	if (MODE == JL3VU)
-		PD->PMD = 0x55515555;
-	else
-		PD->PMD =  0x04140000;
+	PD->PMD =  0x04140000;
 	SYS->PD_H_MFP =	0x00000000;
 	SYS->PD_L_MFP = 0x00000000;
 	PD->PUEN = 0x00000000;
 	PD->OFFD = 0x00000000;
 
-	if (MODE == JL3VU) {
-		SYS->PF_L_MFP = 0x00FF10FF;
-		PF->PMD   = 0XFFFFF014;
-	} else {
-		SYS->PF_L_MFP = 0x00FF0020;
-		PF->PMD   = 0XFFFFF055;
-	}
+	SYS->PF_L_MFP = 0x00FF0020;
+	PF->PMD   = 0XFFFFF055;
 	PF->OFFD = 0x00000000;
 	PF->PUEN = 0x00000000;
 	PF->DOUT = 0x00000000;
-
-
-
-
-
 
 	/* Lock protected registers */
 	/* Give a dummy target frequency here. */
@@ -641,26 +596,7 @@ int32_t main()
 			(1 << SysTick_CTRL_ENABLE_Pos);
 
 	while (1) {
-//		if (MODE == JL3VU) {  /*leon*/
-//			if ((PF->PIN & 0x00000008) && (start_chk == 0)) {
-//				if (timer0_cnt >= 5) {
-//					start_chk = 2;
-//					timer0_cnt = 0;
-//					PD->DOUT |= BIT10;
-//				} 
-//			} else {
-//				if (start_chk == 0)
-//					start_chk = 1;
-//			}	
-//			if ((PF->PIN & 0x00000008) && (start_chk >= 3)) {
-//				timer0_start = 1;
-//				if (timer0_cnt1 >= 2)
-//					goto _RST;
-//			} else {
-//				timer0_start = 0;
-//				timer0_cnt1 = 0;
-//			}
-//		} else {
+
 			if ((PA->PIN & 0x00000008) && (start_chk == 0)) {
 				if (timer0_cnt >= 5) {
 					start_chk = 2;
@@ -668,35 +604,44 @@ int32_t main()
 					PD->DOUT |= BIT9;
 					
 				} else if (timer0_cnt >= 3){
-					if (MODE == JL3PR) {
-						PC->DOUT = 0x00000010;
-						PC->PMD  = 0x10001100;
-						CLK_SysTickDelay(500000); // 5 us
+					
+				#if defined(JL4PR)
+					
+					PC->DOUT = 0x00000010;
+					PC->PMD  = 0x10001100;
+					CLK_SysTickDelay(500000); // 5 us
 
-						SYS->PC_H_MFP = 0x00000007;
-						SYS->PC_L_MFP = 0x70000000;
-						PC->DOUT |= BIT6;
-						PC->OFFD = 0x00000000;
-						PC->PUEN = 0x00000200;
-					} else if (MODE == JL3RH) {
-						PC->DOUT = 0x00000050;
-						PC->PMD  = 0x10001100;
-						CLK_SysTickDelay(500000); // 5 us
+					SYS->PC_H_MFP = 0x00000007;
+					SYS->PC_L_MFP = 0x70000000;
+					PC->DOUT |= BIT6;
+					PC->OFFD = 0x00000000;
+					PC->PUEN = 0x00000200;					
+					
+				#elif defined(JL4RH)
+					
+					PC->DOUT = 0x00000050;
+					PC->PMD  = 0x10001100;
+					CLK_SysTickDelay(500000); // 5 us
 
-						SYS->PC_H_MFP = 0x00000007;
-						SYS->PC_L_MFP = 0x70000000;
-						PC->DOUT |= BIT6;
+					SYS->PC_H_MFP = 0x00000007;
+					SYS->PC_L_MFP = 0x70000000;
+					PC->DOUT |= BIT6;
 						
-					}  else if (MODE == JL3PC) {
-						PC->DOUT = 0x00000050;
-						PC->PMD  = 0x10001101;
-						CLK_SysTickDelay(500000); // 5 us
-						SYS->PC_H_MFP = 0x00000007;
-						SYS->PC_L_MFP = 0x70000003;
-						PC->DOUT |= BIT6;
-						PC->OFFD = 0x00000000;
-						PC->PUEN = 0x00000000;
-					}
+				#elif defined(JL4PC)
+				
+					PC->DOUT = 0x00000050;
+					PC->PMD  = 0x10001101;
+					CLK_SysTickDelay(500000); // 5 us
+					SYS->PC_H_MFP = 0x00000007;
+					SYS->PC_L_MFP = 0x70000003;
+					PC->DOUT |= BIT6;
+					PC->OFFD = 0x00000000;
+					PC->PUEN = 0x00000000;					
+				#else
+				 __NOP();
+				 __NOP();
+				#endif
+
 				}
 			} else {
 				if (start_chk == 0)
@@ -759,19 +704,21 @@ int32_t main()
 			uart_sendbuf[2] = 'M';
 			uart_sendbuf[7] = 'A';
 			uart_sendbuf[8] = 'A';
-			if (MODE == JL3PR)	{
+			
+			#if defined(JL4PR)
 				uart_sendbuf[9] = 'B';
 				uart_sendbuf[10] = 'G';
-			} else if (MODE == JL3RH) {
+			#elif defined(JL4RH)
 				uart_sendbuf[9] = 'B';
 				uart_sendbuf[10] = 'H';
-			} else if (MODE == JL3PC) {
+			#elif defined(JL4PC)
 				uart_sendbuf[9] = 'B';
-				uart_sendbuf[10] = 'F';
-			} else {
-				uart_sendbuf[9] = 'B';
-				uart_sendbuf[10] = 'U';
-			}
+				uart_sendbuf[10] = 'F'			
+			#else
+			 __NOP();
+			 __NOP();
+			#endif
+
 			for (i = 0; i < uart_sendbuf[1] - 3; i++)
 				uart_sendbuf[uart_sendbuf[1] - 3] +=
 				uart_sendbuf[i];
@@ -805,19 +752,20 @@ int32_t main()
 				uart_sendbuf[2] = 'E';
 				uart_sendbuf[3] = 'A';
 				uart_sendbuf[4] = 'A';
-				if (MODE == JL3PR) {
+				
+				#if defined(JL4PR)
 					uart_sendbuf[5] = 'B';
 					uart_sendbuf[6] = 'G';
-				} else if (MODE == JL3RH) {
+				#elif defined(JL4RH)
 					uart_sendbuf[5] = 'B';
 					uart_sendbuf[6] = 'H';
-				} else if (MODE == JL3PC) {
+				#elif defined(JL4PC)
 					uart_sendbuf[5] = 'B';
 					uart_sendbuf[6] = 'F';
-				} else {
-					uart_sendbuf[5] = 'B';
-					uart_sendbuf[6] = 'U';
-				}
+				#else
+				 __NOP();
+				 __NOP();
+				#endif
 
 				for (i = 0; i < uart_sendbuf[1] - 3; i++)
 					uart_sendbuf[uart_sendbuf[1] - 3] +=
@@ -891,19 +839,22 @@ _ISP:
 					uart_sendbuf[3] = 'A';
 					uart_sendbuf[4] = 'A';
 
-					if (MODE == JL3PR) {
+
+					#if defined(JL4PR)
 						uart_sendbuf[5] = 'B';
 						uart_sendbuf[6] = 'G';
-					} else if (MODE == JL3RH) {
+					#elif defined(JL4RH)
 						uart_sendbuf[5] = 'B';
 						uart_sendbuf[6] = 'H';
-					} else if (MODE == JL3PC) {
+					#elif defined(JL4PC)
 						uart_sendbuf[5] = 'B';
 						uart_sendbuf[6] = 'F';
-					} else {//JL3VU
-						uart_sendbuf[5] = 'B';
-						uart_sendbuf[6] = 'U';
-					}
+					#else
+					 __NOP();
+					 __NOP();
+					#endif
+					
+
 					for (i = 0; i < uart_sendbuf[1] - 3; i++)
 						uart_sendbuf[uart_sendbuf[1] - 3] += uart_sendbuf[i];
 					uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
@@ -916,25 +867,16 @@ _ISP:
 				}
 			}
 		}
-		if (MODE == JL3VU) {
-			if (PF->PIN & 0x00000008) {
-				timer0_start = 1;
-				if (timer0_cnt1 >= 5)
-					goto _RST;
-			} else {
-				timer0_start = 0;
-				timer0_cnt1 = 0;
-			}
+
+		if (PA->PIN & 0x00000008) {
+			timer0_start = 1;
+			if (timer0_cnt1 >= 5)
+				goto _RST;
 		} else {
-			if (PA->PIN & 0x00000008) {
-				timer0_start = 1;
-				if (timer0_cnt1 >= 5)
-					goto _RST;
-			} else {
-				timer0_start = 0;
-				timer0_cnt1 = 0;
-			}
+			timer0_start = 0;
+			timer0_cnt1 = 0;
 		}
+		
 		if (lcmd_reg == CMD_RUN_APROM) {
 			if (led_tt >= 30) {
 				goto _RST;
@@ -978,16 +920,12 @@ void TMR1_IRQHandler(void)
 	TIMER1->ISR = TIMER_ISR_TMR_IS_Msk;
 	switch (led_mode) {
 	case 1:
-		if (MODE == JL3VU)
-			PD->DOUT ^= BIT10;
-		else
-			PD->DOUT ^= BIT9;
+		
+		PD->DOUT ^= BIT9;
 		break;
 	case 2:
-		if (MODE == JL3VU)
-			PD->DOUT ^= BIT10;
-		else
-			PD->DOUT ^= BIT9;
+
+		PD->DOUT ^= BIT9;
 		break;
 	}
 }
