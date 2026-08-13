@@ -16,6 +16,7 @@
 //#define JL4PR
 //#define JL4PC
 
+#define FW_BIN_ADDR	0
 
 #define USING_AUTODETECT
 
@@ -94,6 +95,10 @@ volatile uint16_t led_tt = 0;
 volatile uint16_t led_mode = 0;
 
 volatile uint32_t fmc_data;
+
+uint32_t check_aprom_checksum(void);
+void  bin_to_approm (void);
+
 /* 從Flash讀出序號, 20170407 */
 int FMC_Read1(unsigned int address)
 {
@@ -624,6 +629,8 @@ int32_t main()
 
     // Flash Test
     view = SpiFlash_ReadMidDid();
+    view = check_aprom_checksum();
+    bin_to_approm();
     //spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
    // SpiFlash_NormalPageProgram(0,0x11223344);	    
     //view = SpiFlash_NormalRead(0);
@@ -961,4 +968,40 @@ void TMR1_IRQHandler(void)
 		PD->DOUT ^= BIT9;
 		break;
 	}
+}
+
+uint32_t check_aprom_checksum(void)			//約50ms完成
+{
+	uint16_t i,j;
+	uint32_t check_sum;
+	uint32_t upd_data[128];
+
+	check_sum = 0;
+
+	for (i = 0; i < 64; i++) {
+
+		ReadData( i * 0x200,  i * 0x200 + 0x200, (uint32_t *)upd_data);
+
+		for (j = 0; j < 128;j++)
+			check_sum+= upd_data[j];
+
+	}
+
+	return check_sum;
+}
+__IO uint32_t data_upd_data[128];
+void  bin_to_approm (void)
+{
+	//uint32_t data_upd_data[128];
+	uint16_t i,j;
+
+	for (i = 0; i < 64; i++) {
+
+		for (j = 0; j < 128; j++)
+			data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
+
+		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
+
+	}
+
 }
