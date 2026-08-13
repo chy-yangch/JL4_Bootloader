@@ -9,10 +9,13 @@
 #include "sys.h"
 #include "clk.h"
 #include "timer.h"
+#include "W25Q32.h"
+#include "gpio.h"
 
 #define JL4RH
 //#define JL4PR
 //#define JL4PC
+
 
 #define USING_AUTODETECT
 
@@ -51,6 +54,10 @@
 #define BLE_WAKEUP              PC6
 // LED
 #define SYNC_LED                PC1
+
+#define APO_PIN	PC14
+#define TSL_PIN	PA5
+#define FCS_PIN	PA6
 
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
@@ -450,7 +457,7 @@ void CLK_SysTickDelay(uint32_t us)
 	/* Waiting for down-count to zero */
 	while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0);
 }
-
+__IO uint32_t view;
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
@@ -481,7 +488,7 @@ int32_t main()
 	}
 	/* reseaved bit defined in main : enable 10kHz */
 	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
-	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN;
+	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN;
 
     #if defined(JL4PR)
 	PA->DOUT = 0x00000000;
@@ -594,6 +601,32 @@ int32_t main()
 	SysTick->VAL  = 0x00;
 	SysTick->CTRL = SysTick->CTRL | (1 << SysTick_CTRL_CLKSOURCE_Pos) |
 			(1 << SysTick_CTRL_ENABLE_Pos);
+
+
+    APO_PIN = 0;
+    TSL_PIN = 0;
+    FCS_PIN = 0;   
+    
+    /* Setup SPI1 multi-function pins */
+    SYS->PA_H_MFP = 0x66660000;
+    
+    /* Configure as a slave, clock idle low, 32-bit transaction, drive output on falling clock edge and latch input on rising edge. */
+    /* Configure SPI1 as a low level active device. */
+    /* Default setting: slave selection signal is low level active. */    
+    SPI1->SSR = 0x00000005;
+    /* Default setting: MSB first, disable unit transfer interrupt, SP_CYCLE = 0. */    
+    SPI1->CTL = 0x00200044;
+    /* Set DIVIDER = 0 */
+    SPI1->CLKDIV = 0U;    
+    SPI1->FFCTL = 0x44000000;
+    
+ 
+
+    // Flash Test
+    view = SpiFlash_ReadMidDid();
+    //spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
+   // SpiFlash_NormalPageProgram(0,0x11223344);	    
+    //view = SpiFlash_NormalRead(0);
 
 	while (1) {
 

@@ -451,6 +451,11 @@
               <FileType>1</FileType>
               <FilePath>.\FMC.c</FilePath>
             </File>
+            <File>
+              <FileName>W25Q32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\W25Q32.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
