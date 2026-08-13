@@ -1,0 +1,46 @@
+Dependencies for Project 'ISPCode_Nano112', Target 'ISPCode_Nano112_UARTOnly': (DO NOT MODIFY !)
+F (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\system_Nano1X2Series.c)(0x547FB518)(-c --cpu Cortex-M0 -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I..\..\..\Library\CMSIS\Include -I..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include -I..\..\..\Library\StdDriver\inc-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include-o .\obj\system_nano1x2series.o --omf_browse .\obj\system_nano1x2series.crf --depend .\obj\system_nano1x2series.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x52FDD27E)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cm0.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cmInstr.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cmFunc.h)(0x547FB518)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\system_Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\sys.h)(0x5432506C)
+I (..\..\..\Library\StdDriver\inc\clk.h)(0x543B3B48)
+F (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\ARM\startup_Nano1X2Series.s)(0x55079DB8)(--cpu Cortex-M0 -g --16 --apcs=interwork --pd "__MICROLIB SETA 1"-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include--list .\lst\startup_nano1x2series.lst --xref -o .\obj\startup_nano1x2series.o --depend .\obj\startup_nano1x2series.d)
+F (.\Main.c)(0x5B1792DF)(-c --cpu Cortex-M0 -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I..\..\..\Library\CMSIS\Include -I..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include -I..\..\..\Library\StdDriver\inc-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x52FDD27E)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cm0.h)(0x547FB518)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x52FDD27E)
+I (..\..\..\Library\CMSIS\Include\core_cmInstr.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cmFunc.h)(0x547FB518)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\system_Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\sys.h)(0x5432506C)
+I (..\..\..\Library\StdDriver\inc\clk.h)(0x543B3B48)
+I (fmc.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\timer.h)(0x547FB518)
+F (.\FMC.c)(0x547FB518)(-c --cpu Cortex-M0 -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I..\..\..\Library\CMSIS\Include -I..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include -I..\..\..\Library\StdDriver\inc-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include-o .\obj\fmc.o --omf_browse .\obj\fmc.crf --depend .\obj\fmc.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x52FDD27E)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cm0.h)(0x547FB518)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x52FDD27E)
+I (..\..\..\Library\CMSIS\Include\core_cmInstr.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cmFunc.h)(0x547FB518)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\system_Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\sys.h)(0x5432506C)
+I (..\..\..\Library\StdDriver\inc\clk.h)(0x543B3B48)
+I (fmc.h)(0x547FB518)
+F (.\siktool.c)(0x5B17929E)(-c --cpu Cortex-M0 -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I..\..\..\Library\CMSIS\Include -I..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include -I..\..\..\Library\StdDriver\inc-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\3.20.4\CMSIS\Include-o .\obj\siktool.o --omf_browse .\obj\siktool.crf --depend .\obj\siktool.d)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x52FDD27E)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cm0.h)(0x547FB518)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x52FDD27E)
+I (..\..\..\Library\CMSIS\Include\core_cmInstr.h)(0x547FB518)
+I (..\..\..\Library\CMSIS\Include\core_cmFunc.h)(0x547FB518)
+I (..\..\..\Library\Device\Nuvoton\Nano1X2Series\Include\system_Nano1X2Series.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\sys.h)(0x5432506C)
+I (..\..\..\Library\StdDriver\inc\clk.h)(0x543B3B48)
+I (fmc.h)(0x547FB518)
+I (..\..\..\Library\StdDriver\inc\timer.h)(0x547FB518)

@@ -1,0 +1,427 @@
+Component: ARM Compiler 5.06 update 6 (build 750) Tool: armlink [4d35ed]
+
+==============================================================================
+
+Small function inlining results
+
+Inlined total of 0 calls.
+
+==============================================================================
+
+Section Cross References
+
+    system_nano1x2series.o(i.SysGet_HCLKFreq) refers to system_nano1x2series.o(i.SysGet_PLLClockFreq) for SysGet_PLLClockFreq
+    system_nano1x2series.o(i.SysGet_HCLKFreq) refers to uidiv.o(.text) for __aeabi_uidivmod
+    system_nano1x2series.o(i.SysGet_PLLClockFreq) refers to uidiv.o(.text) for __aeabi_uidivmod
+    system_nano1x2series.o(i.SystemCoreClockUpdate) refers to system_nano1x2series.o(i.SysGet_HCLKFreq) for SysGet_HCLKFreq
+    system_nano1x2series.o(i.SystemCoreClockUpdate) refers to uidiv.o(.text) for __aeabi_uidivmod
+    system_nano1x2series.o(i.SystemCoreClockUpdate) refers to system_nano1x2series.o(.data) for .data
+    startup_nano1x2series.o(RESET) refers to startup_nano1x2series.o(STACK) for __initial_sp
+    startup_nano1x2series.o(RESET) refers to startup_nano1x2series.o(.text) for Reset_Handler
+    startup_nano1x2series.o(RESET) refers to main.o(i.TMR0_IRQHandler) for TMR0_IRQHandler
+    startup_nano1x2series.o(RESET) refers to main.o(i.TMR1_IRQHandler) for TMR1_IRQHandler
+    startup_nano1x2series.o(RESET) refers to main.o(i.UART1_IRQHandler) for UART1_IRQHandler
+    startup_nano1x2series.o(.text) refers to entry.o(.ARM.Collect$$$$00000000) for __main
+    main.o(i.BLE_sleep) refers to main.o(i.CLK_SysTickDelay) for CLK_SysTickDelay
+    main.o(i.BLE_wakeup) refers to main.o(i.CLK_SysTickDelay) for CLK_SysTickDelay
+    main.o(i.CLK_SysTickDelay) refers to system_nano1x2series.o(.data) for CyclesPerUs
+    main.o(i.FMC_Read1) refers to main.o(.data) for .data
+    main.o(i.ParseCmd) refers to fmc.o(i.ReadData) for ReadData
+    main.o(i.ParseCmd) refers to fmc.o(i.EraseAP) for EraseAP
+    main.o(i.ParseCmd) refers to fmc.o(i.UpdateConfig) for UpdateConfig
+    main.o(i.ParseCmd) refers to fmc.o(i.GetDataFlashInfo) for GetDataFlashInfo
+    main.o(i.ParseCmd) refers to fmc.o(i.FMC_Erase) for FMC_Erase
+    main.o(i.ParseCmd) refers to fmc.o(i.WriteData) for WriteData
+    main.o(i.ParseCmd) refers to main.o(i.Checksum) for Checksum
+    main.o(i.ParseCmd) refers to main.o(.bss) for .bss
+    main.o(i.ParseCmd) refers to main.o(.data) for .data
+    main.o(i.PutString) refers to main.o(.data) for .data
+    main.o(i.PutString) refers to main.o(.bss) for .bss
+    main.o(i.TMR0_IRQHandler) refers to main.o(.data) for .data
+    main.o(i.TMR1_IRQHandler) refers to main.o(.data) for .data
+    main.o(i.UART1_IRQHandler) refers to main.o(.data) for .data
+    main.o(i.UART1_IRQHandler) refers to main.o(.bss) for .bss
+    main.o(i.main) refers to main.o(i.NVIC_SetPriority) for NVIC_SetPriority
+    main.o(i.main) refers to fmc.o(i.FMC_Read) for FMC_Read
+    main.o(i.main) refers to fmc.o(i.GetDataFlashInfo) for GetDataFlashInfo
+    main.o(i.main) refers to main.o(i.CLK_SysTickDelay) for CLK_SysTickDelay
+    main.o(i.main) refers to main.o(i.__ARM_common_switch8) for __ARM_common_switch8
+    main.o(i.main) refers to main.o(i.BLE_wakeup) for BLE_wakeup
+    main.o(i.main) refers to main.o(i.FMC_Read1) for FMC_Read1
+    main.o(i.main) refers to main.o(.data) for .data
+    main.o(i.main) refers to main.o(.bss) for .bss
+    main.o(i.main) refers to main.o(i.PutString) for PutString
+    main.o(i.main) refers to main.o(i.BLE_sleep) for BLE_sleep
+    main.o(i.main) refers to main.o(i.ParseCmd) for ParseCmd
+    main.o(i.main) refers to fmc.o(i.FMC_Write) for FMC_Write
+    main.o(i.main) refers to main.o(i.SysTimerDelay) for SysTimerDelay
+    fmc.o(i.EraseAP) refers to fmc.o(i.FMC_Erase) for FMC_Erase
+    fmc.o(i.EraseAP) refers to main.o(.data) for g_dataFlashAddr
+    fmc.o(i.GetDataFlashInfo) refers to fmc.o(i.FMC_Read) for FMC_Read
+    fmc.o(i.GetDataFlashInfo) refers to main.o(.data) for g_apromSize
+    fmc.o(i.ReadData) refers to fmc.o(i.FMC_Read) for FMC_Read
+    fmc.o(i.UpdateConfig) refers to fmc.o(i.FMC_Erase) for FMC_Erase
+    fmc.o(i.UpdateConfig) refers to fmc.o(i.FMC_Write) for FMC_Write
+    fmc.o(i.UpdateConfig) refers to fmc.o(i.FMC_Read) for FMC_Read
+    fmc.o(i.WriteData) refers to fmc.o(i.FMC_Write) for FMC_Write
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry10a.o(.ARM.Collect$$$$0000000D) for __rt_final_cpp
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry11a.o(.ARM.Collect$$$$0000000F) for __rt_final_exit
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry7b.o(.ARM.Collect$$$$00000008) for _main_clock
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry8b.o(.ARM.Collect$$$$0000000A) for _main_cpp_init
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry9a.o(.ARM.Collect$$$$0000000B) for _main_init
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry5.o(.ARM.Collect$$$$00000004) for _main_scatterload
+    entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry2.o(.ARM.Collect$$$$00000001) for _main_stk
+    entry2.o(.ARM.Collect$$$$00000001) refers to entry2.o(.ARM.Collect$$$$00002712) for __lit__00000000
+    entry2.o(.ARM.Collect$$$$00002712) refers to startup_nano1x2series.o(STACK) for __initial_sp
+    entry2.o(__vectab_stack_and_reset_area) refers to startup_nano1x2series.o(STACK) for __initial_sp
+    entry2.o(__vectab_stack_and_reset_area) refers to entry.o(.ARM.Collect$$$$00000000) for __main
+    entry5.o(.ARM.Collect$$$$00000004) refers to init.o(.text) for __scatterload
+    entry9a.o(.ARM.Collect$$$$0000000B) refers to main.o(i.main) for main
+    entry9b.o(.ARM.Collect$$$$0000000C) refers to main.o(i.main) for main
+    init.o(.text) refers to entry5.o(.ARM.Collect$$$$00000004) for __main_after_scatterload
+
+
+==============================================================================
+
+Removing Unused input sections from the image.
+
+    Removing system_nano1x2series.o(.rev16_text), (4 bytes).
+    Removing system_nano1x2series.o(.revsh_text), (4 bytes).
+    Removing system_nano1x2series.o(i.SysGet_HCLKFreq), (68 bytes).
+    Removing system_nano1x2series.o(i.SysGet_PLLClockFreq), (60 bytes).
+    Removing system_nano1x2series.o(i.SystemCoreClockUpdate), (32 bytes).
+    Removing startup_nano1x2series.o(HEAP), (512 bytes).
+    Removing main.o(.rev16_text), (4 bytes).
+    Removing main.o(.revsh_text), (4 bytes).
+    Removing main.o(.data), (4 bytes).
+    Removing main.o(.data), (4 bytes).
+    Removing fmc.o(.rev16_text), (4 bytes).
+    Removing fmc.o(.revsh_text), (4 bytes).
+
+12 unused section(s) (total 704 bytes) removed from the image.
+
+==============================================================================
+
+Image Symbol Table
+
+    Local Symbols
+
+    Symbol Name                              Value     Ov Type        Size  Object(Section)
+
+    RESET                                    0x00000000   Section      192  startup_nano1x2series.o(RESET)
+    ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\ARM\startup_Nano1X2Series.s 0x00000000   Number         0  startup_nano1x2series.o ABSOLUTE
+    ..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\system_Nano1X2Series.c 0x00000000   Number         0  system_nano1x2series.o ABSOLUTE
+    ..\\..\\..\\Library\\Device\\Nuvoton\\Nano1X2Series\\Source\\system_Nano1X2Series.c 0x00000000   Number         0  system_nano1x2series.o ABSOLUTE
+    FMC.c                                    0x00000000   Number         0  fmc.o ABSOLUTE
+    FMC.c                                    0x00000000   Number         0  fmc.o ABSOLUTE
+    Main.c                                   0x00000000   Number         0  main.o ABSOLUTE
+    Main.c                                   0x00000000   Number         0  main.o ABSOLUTE
+    handlers.s                               0x00000000   Number         0  handlers.o ABSOLUTE
+    init.s                                   0x00000000   Number         0  init.o ABSOLUTE
+    .ARM.Collect$$$$00000000                 0x000000c0   Section        0  entry.o(.ARM.Collect$$$$00000000)
+    .ARM.Collect$$$$00000001                 0x000000c0   Section        4  entry2.o(.ARM.Collect$$$$00000001)
+    .ARM.Collect$$$$00000004                 0x000000c4   Section        4  entry5.o(.ARM.Collect$$$$00000004)
+    .ARM.Collect$$$$00000008                 0x000000c8   Section        0  entry7b.o(.ARM.Collect$$$$00000008)
+    .ARM.Collect$$$$0000000A                 0x000000c8   Section        0  entry8b.o(.ARM.Collect$$$$0000000A)
+    .ARM.Collect$$$$0000000B                 0x000000c8   Section        8  entry9a.o(.ARM.Collect$$$$0000000B)
+    .ARM.Collect$$$$0000000D                 0x000000d0   Section        0  entry10a.o(.ARM.Collect$$$$0000000D)
+    .ARM.Collect$$$$0000000F                 0x000000d0   Section        0  entry11a.o(.ARM.Collect$$$$0000000F)
+    .ARM.Collect$$$$00002712                 0x000000d0   Section        4  entry2.o(.ARM.Collect$$$$00002712)
+    __lit__00000000                          0x000000d0   Data           4  entry2.o(.ARM.Collect$$$$00002712)
+    .text                                    0x000000d4   Section       84  startup_nano1x2series.o(.text)
+    Default_Handler                          0x00000105   Thumb Code     2  startup_nano1x2series.o(.text)
+    .text                                    0x00000128   Section       36  init.o(.text)
+    i.BLE_sleep                              0x0000014c   Section        0  main.o(i.BLE_sleep)
+    i.BLE_wakeup                             0x00000168   Section        0  main.o(i.BLE_wakeup)
+    i.CLK_SysTickDelay                       0x00000190   Section        0  main.o(i.CLK_SysTickDelay)
+    i.Checksum                               0x000001b4   Section        0  main.o(i.Checksum)
+    Checksum                                 0x000001b5   Thumb Code    24  main.o(i.Checksum)
+    i.EraseAP                                0x000001cc   Section        0  fmc.o(i.EraseAP)
+    i.FMC_Erase                              0x000001f4   Section        0  fmc.o(i.FMC_Erase)
+    i.FMC_Read                               0x0000021c   Section        0  fmc.o(i.FMC_Read)
+    i.FMC_Read1                              0x00000248   Section        0  main.o(i.FMC_Read1)
+    i.FMC_Write                              0x0000027c   Section        0  fmc.o(i.FMC_Write)
+    i.GetDataFlashInfo                       0x000002a4   Section        0  fmc.o(i.GetDataFlashInfo)
+    i.NVIC_SetPriority                       0x000002f8   Section        0  main.o(i.NVIC_SetPriority)
+    NVIC_SetPriority                         0x000002f9   Thumb Code    60  main.o(i.NVIC_SetPriority)
+    i.ParseCmd                               0x0000033c   Section        0  main.o(i.ParseCmd)
+    ParseCmd                                 0x0000033d   Thumb Code   632  main.o(i.ParseCmd)
+    i.PutString                              0x000005d8   Section        0  main.o(i.PutString)
+    i.ReadData                               0x00000604   Section        0  fmc.o(i.ReadData)
+    i.SysTimerDelay                          0x00000620   Section        0  main.o(i.SysTimerDelay)
+    i.TMR0_IRQHandler                        0x00000640   Section        0  main.o(i.TMR0_IRQHandler)
+    i.TMR1_IRQHandler                        0x0000068c   Section        0  main.o(i.TMR1_IRQHandler)
+    i.UART1_IRQHandler                       0x000006c8   Section        0  main.o(i.UART1_IRQHandler)
+    i.UpdateConfig                           0x00000740   Section        0  fmc.o(i.UpdateConfig)
+    i.WriteData                              0x00000790   Section        0  fmc.o(i.WriteData)
+    i.__ARM_common_switch8                   0x000007ac   Section        0  main.o(i.__ARM_common_switch8)
+    i.__scatterload_copy                     0x000007c6   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x000007d4   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x000007d6   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.main                                   0x000007e4   Section        0  main.o(i.main)
+    .data                                    0x20000000   Section        8  system_nano1x2series.o(.data)
+    .data                                    0x20000008   Section       88  main.o(.data)
+    g_UARTIRQ                                0x2000000d   Data           1  main.o(.data)
+    bufhead                                  0x2000000e   Data           1  main.o(.data)
+    g_pUART                                  0x2000001c   Data           4  main.o(.data)
+    StartAddress                             0x20000020   Data           4  main.o(.data)
+    StartAddress_bak                         0x20000024   Data           4  main.o(.data)
+    TotalLen                                 0x20000028   Data           4  main.o(.data)
+    TotalLen_bak                             0x2000002c   Data           4  main.o(.data)
+    LastDataLen                              0x20000030   Data           4  main.o(.data)
+    g_packno                                 0x20000034   Data           4  main.o(.data)
+    gcmd                                     0x20000038   Data           4  main.o(.data)
+    .bss                                     0x20000060   Section      640  main.o(.bss)
+    uart_rcvbuf                              0x20000060   Data          64  main.o(.bss)
+    uart_sendbuf                             0x200000a0   Data          64  main.o(.bss)
+    aprom_buf                                0x200000e0   Data         512  main.o(.bss)
+    STACK                                    0x200002e0   Section     1280  startup_nano1x2series.o(STACK)
+
+    Global Symbols
+
+    Symbol Name                              Value     Ov Type        Size  Object(Section)
+
+    BuildAttributes$$THM_ISAv3M$S$PE$A:L22$X:L11$S22$IEEE1$IW$USESV6$~STKCKD$USESV7$~SHL$OSPACE$EBA8$MICROLIB$REQ8$PRES8$EABIv2 0x00000000   Number         0  anon$$obj.o ABSOLUTE
+    __ARM_use_no_argv                        0x00000000   Number         0  main.o ABSOLUTE
+    __Vectors                                0x00000000   Data           4  startup_nano1x2series.o(RESET)
+    __cpp_initialize__aeabi_                  - Undefined Weak Reference
+    __cxa_finalize                            - Undefined Weak Reference
+    __decompress                              - Undefined Weak Reference
+    _clock_init                               - Undefined Weak Reference
+    _microlib_exit                            - Undefined Weak Reference
+    __main                                   0x000000c1   Thumb Code     0  entry.o(.ARM.Collect$$$$00000000)
+    _main_stk                                0x000000c1   Thumb Code     0  entry2.o(.ARM.Collect$$$$00000001)
+    _main_scatterload                        0x000000c5   Thumb Code     0  entry5.o(.ARM.Collect$$$$00000004)
+    __main_after_scatterload                 0x000000c9   Thumb Code     0  entry5.o(.ARM.Collect$$$$00000004)
+    _main_clock                              0x000000c9   Thumb Code     0  entry7b.o(.ARM.Collect$$$$00000008)
+    _main_cpp_init                           0x000000c9   Thumb Code     0  entry8b.o(.ARM.Collect$$$$0000000A)
+    _main_init                               0x000000c9   Thumb Code     0  entry9a.o(.ARM.Collect$$$$0000000B)
+    __rt_final_cpp                           0x000000d1   Thumb Code     0  entry10a.o(.ARM.Collect$$$$0000000D)
+    __rt_final_exit                          0x000000d1   Thumb Code     0  entry11a.o(.ARM.Collect$$$$0000000F)
+    Reset_Handler                            0x000000d5   Thumb Code    38  startup_nano1x2series.o(.text)
+    NMI_Handler                              0x000000fb   Thumb Code     2  startup_nano1x2series.o(.text)
+    HardFault_Handler                        0x000000fd   Thumb Code     2  startup_nano1x2series.o(.text)
+    SVC_Handler                              0x000000ff   Thumb Code     2  startup_nano1x2series.o(.text)
+    PendSV_Handler                           0x00000101   Thumb Code     2  startup_nano1x2series.o(.text)
+    SysTick_Handler                          0x00000103   Thumb Code     2  startup_nano1x2series.o(.text)
+    ACMP_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    ADC_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    BOD_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    EINT0_IRQHandler                         0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    EINT1_IRQHandler                         0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    GPABC_IRQHandler                         0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    GPDEF_IRQHandler                         0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    HIRC_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    I2C0_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    I2C1_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    LCD_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    PDMA_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    PDWU_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    PWM0_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    PWM1_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    RTC_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    SC0_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    SC1_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    SPI0_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    SPI1_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    TMR2_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    TMR3_IRQHandler                          0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    UART0_IRQHandler                         0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    WDT_IRQHandler                           0x00000105   Thumb Code     0  startup_nano1x2series.o(.text)
+    __scatterload                            0x00000129   Thumb Code    28  init.o(.text)
+    __scatterload_rt2                        0x00000129   Thumb Code     0  init.o(.text)
+    BLE_sleep                                0x0000014d   Thumb Code    20  main.o(i.BLE_sleep)
+    BLE_wakeup                               0x00000169   Thumb Code    32  main.o(i.BLE_wakeup)
+    CLK_SysTickDelay                         0x00000191   Thumb Code    26  main.o(i.CLK_SysTickDelay)
+    EraseAP                                  0x000001cd   Thumb Code    36  fmc.o(i.EraseAP)
+    FMC_Erase                                0x000001f5   Thumb Code    34  fmc.o(i.FMC_Erase)
+    FMC_Read                                 0x0000021d   Thumb Code    40  fmc.o(i.FMC_Read)
+    FMC_Read1                                0x00000249   Thumb Code    42  main.o(i.FMC_Read1)
+    FMC_Write                                0x0000027d   Thumb Code    36  fmc.o(i.FMC_Write)
+    GetDataFlashInfo                         0x000002a5   Thumb Code    76  fmc.o(i.GetDataFlashInfo)
+    PutString                                0x000005d9   Thumb Code    34  main.o(i.PutString)
+    ReadData                                 0x00000605   Thumb Code    28  fmc.o(i.ReadData)
+    SysTimerDelay                            0x00000621   Thumb Code    26  main.o(i.SysTimerDelay)
+    TMR0_IRQHandler                          0x00000641   Thumb Code    60  main.o(i.TMR0_IRQHandler)
+    TMR1_IRQHandler                          0x0000068d   Thumb Code    48  main.o(i.TMR1_IRQHandler)
+    UART1_IRQHandler                         0x000006c9   Thumb Code   110  main.o(i.UART1_IRQHandler)
+    UpdateConfig                             0x00000741   Thumb Code    70  fmc.o(i.UpdateConfig)
+    WriteData                                0x00000791   Thumb Code    28  fmc.o(i.WriteData)
+    __ARM_common_switch8                     0x000007ad   Thumb Code    26  main.o(i.__ARM_common_switch8)
+    __scatterload_copy                       0x000007c7   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x000007d5   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x000007d7   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    main                                     0x000007e5   Thumb Code  1894  main.o(i.main)
+    Region$$Table$$Base                      0x00000f6c   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00000f8c   Number         0  anon$$obj.o(Region$$Table)
+    SystemCoreClock                          0x20000000   Data           4  system_nano1x2series.o(.data)
+    CyclesPerUs                              0x20000004   Data           4  system_nano1x2series.o(.data)
+    JL3PR                                    0x20000008   Data           1  main.o(.data)
+    JL3RH                                    0x20000009   Data           1  main.o(.data)
+    JL3PC                                    0x2000000a   Data           1  main.o(.data)
+    JL3VU                                    0x2000000b   Data           1  main.o(.data)
+    start_chk                                0x2000000c   Data           1  main.o(.data)
+    timer0_cnt                               0x20000010   Data           2  main.o(.data)
+    timer0_start                             0x20000012   Data           2  main.o(.data)
+    timer0_cnt1                              0x20000014   Data           2  main.o(.data)
+    led_tt                                   0x20000016   Data           2  main.o(.data)
+    led_mode                                 0x20000018   Data           2  main.o(.data)
+    bUartDataReady                           0x2000003c   Data           4  main.o(.data)
+    bUpdateApromCmd                          0x20000040   Data           4  main.o(.data)
+    g_apromSize                              0x20000044   Data           4  main.o(.data)
+    g_dataFlashAddr                          0x20000048   Data           4  main.o(.data)
+    g_dataFlashSize                          0x2000004c   Data           4  main.o(.data)
+    g_pdid                                   0x20000050   Data           4  main.o(.data)
+    g_timecnt                                0x20000054   Data           4  main.o(.data)
+    lcmd_reg                                 0x20000058   Data           4  main.o(.data)
+    fmc_data                                 0x2000005c   Data           4  main.o(.data)
+    __initial_sp                             0x200007e0   Data           0  startup_nano1x2series.o(STACK)
+
+
+
+==============================================================================
+
+Memory Map of the image
+
+  Image Entry point : 0x000000d5
+
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000fec, Max: 0xffffffff, ABSOLUTE)
+
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000f8c, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x00000000   0x00000000   0x000000c0   Data   RO           65    RESET               startup_nano1x2series.o
+    0x000000c0   0x000000c0   0x00000000   Code   RO          252  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
+    0x000000c0   0x000000c0   0x00000004   Code   RO          255    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
+    0x000000c4   0x000000c4   0x00000004   Code   RO          258    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
+    0x000000c8   0x000000c8   0x00000000   Code   RO          260    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
+    0x000000c8   0x000000c8   0x00000000   Code   RO          262    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
+    0x000000c8   0x000000c8   0x00000008   Code   RO          263    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
+    0x000000d0   0x000000d0   0x00000000   Code   RO          265    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
+    0x000000d0   0x000000d0   0x00000000   Code   RO          267    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
+    0x000000d0   0x000000d0   0x00000004   Code   RO          256    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
+    0x000000d4   0x000000d4   0x00000054   Code   RO           66  * .text               startup_nano1x2series.o
+    0x00000128   0x00000128   0x00000024   Code   RO          269    .text               mc_p.l(init.o)
+    0x0000014c   0x0000014c   0x0000001c   Code   RO           72    i.BLE_sleep         main.o
+    0x00000168   0x00000168   0x00000028   Code   RO           73    i.BLE_wakeup        main.o
+    0x00000190   0x00000190   0x00000024   Code   RO           74    i.CLK_SysTickDelay  main.o
+    0x000001b4   0x000001b4   0x00000018   Code   RO           75    i.Checksum          main.o
+    0x000001cc   0x000001cc   0x00000028   Code   RO          185    i.EraseAP           fmc.o
+    0x000001f4   0x000001f4   0x00000028   Code   RO          186    i.FMC_Erase         fmc.o
+    0x0000021c   0x0000021c   0x0000002c   Code   RO          187    i.FMC_Read          fmc.o
+    0x00000248   0x00000248   0x00000034   Code   RO           76    i.FMC_Read1         main.o
+    0x0000027c   0x0000027c   0x00000028   Code   RO          188    i.FMC_Write         fmc.o
+    0x000002a4   0x000002a4   0x00000054   Code   RO          189    i.GetDataFlashInfo  fmc.o
+    0x000002f8   0x000002f8   0x00000044   Code   RO           77    i.NVIC_SetPriority  main.o
+    0x0000033c   0x0000033c   0x0000029c   Code   RO           78    i.ParseCmd          main.o
+    0x000005d8   0x000005d8   0x0000002c   Code   RO           79    i.PutString         main.o
+    0x00000604   0x00000604   0x0000001c   Code   RO          190    i.ReadData          fmc.o
+    0x00000620   0x00000620   0x00000020   Code   RO           80    i.SysTimerDelay     main.o
+    0x00000640   0x00000640   0x0000004c   Code   RO           81    i.TMR0_IRQHandler   main.o
+    0x0000068c   0x0000068c   0x0000003c   Code   RO           82    i.TMR1_IRQHandler   main.o
+    0x000006c8   0x000006c8   0x00000078   Code   RO           83    i.UART1_IRQHandler  main.o
+    0x00000740   0x00000740   0x00000050   Code   RO          191    i.UpdateConfig      fmc.o
+    0x00000790   0x00000790   0x0000001c   Code   RO          192    i.WriteData         fmc.o
+    0x000007ac   0x000007ac   0x0000001a   Code   RO          158    i.__ARM_common_switch8  main.o
+    0x000007c6   0x000007c6   0x0000000e   Code   RO          273    i.__scatterload_copy  mc_p.l(handlers.o)
+    0x000007d4   0x000007d4   0x00000002   Code   RO          274    i.__scatterload_null  mc_p.l(handlers.o)
+    0x000007d6   0x000007d6   0x0000000e   Code   RO          275    i.__scatterload_zeroinit  mc_p.l(handlers.o)
+    0x000007e4   0x000007e4   0x00000788   Code   RO           84    i.main              main.o
+    0x00000f6c   0x00000f6c   0x00000020   Data   RO          271    Region$$Table       anon$$obj.o
+
+
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000f8c, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20000000   0x00000f8c   0x00000008   Data   RW            6    .data               system_nano1x2series.o
+    0x20000008   0x00000f94   0x00000058   Data   RW           86    .data               main.o
+
+
+    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000fec, Size: 0x00000780, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20000060        -       0x00000280   Zero   RW           85    .bss                main.o
+    0x200002e0        -       0x00000500   Zero   RW           63    STACK               startup_nano1x2series.o
+
+
+==============================================================================
+
+Image component sizes
+
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
+
+       384         36          0          0          0       5370   fmc.o
+      3202        304          0         88        640     107028   main.o
+        84         34        192          0       1280        756   startup_nano1x2series.o
+         0          0          0          8          0       4898   system_nano1x2series.o
+
+    ----------------------------------------------------------------------
+      3670        374        224         96       1920     118052   Object Totals
+         0          0         32          0          0          0   (incl. Generated)
+         0          0          0          0          0          0   (incl. Padding)
+
+    ----------------------------------------------------------------------
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Library Member Name
+
+         0          0          0          0          0          0   entry.o
+         0          0          0          0          0          0   entry10a.o
+         0          0          0          0          0          0   entry11a.o
+         8          4          0          0          0          0   entry2.o
+         4          0          0          0          0          0   entry5.o
+         0          0          0          0          0          0   entry7b.o
+         0          0          0          0          0          0   entry8b.o
+         8          4          0          0          0          0   entry9a.o
+        30          0          0          0          0          0   handlers.o
+        36          8          0          0          0         68   init.o
+
+    ----------------------------------------------------------------------
+        86         16          0          0          0         68   Library Totals
+         0          0          0          0          0          0   (incl. Padding)
+
+    ----------------------------------------------------------------------
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Library Name
+
+        86         16          0          0          0         68   mc_p.l
+
+    ----------------------------------------------------------------------
+        86         16          0          0          0         68   Library Totals
+
+    ----------------------------------------------------------------------
+
+==============================================================================
+
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
+
+      3756        390        224         96       1920     117524   Grand Totals
+      3756        390        224         96       1920     117524   ELF Image Totals
+      3756        390        224         96          0          0   ROM Totals
+
+==============================================================================
+
+    Total RO  Size (Code + RO Data)                 3980 (   3.89kB)
+    Total RW  Size (RW Data + ZI Data)              2016 (   1.97kB)
+    Total ROM Size (Code + RO Data + RW Data)       4076 (   3.98kB)
+
+==============================================================================
+
