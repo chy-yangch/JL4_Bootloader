@@ -204,3 +204,42 @@ void SpiFlash_NormalPageProgram(uint32_t addr, uint32_t data)
 	SPI_ClearRxFIFO(SPI_FLASH_PORT);
 	SpiFlash_WaitReady_1();
 }
+
+void SpiFlash_ChipErase_logger(uint8_t sets)
+{
+
+//  0 sets:  0x000000 ~ 0x1FFFFF
+//  1 sets:  0x200000 ~ 0x3FFFFF
+
+//set 0:  0x000000  ~  0x0FFFFF
+//set 1:  0x100000  ~  0x1FFFFF
+//set 2:  0x200000  ~  0x2FFFFF
+//set 3:  0x300000  ~  0x3FFFFF
+// 資料分別 4個 sets
+
+	uint32_t addre;
+	uint32_t addre1;
+	uint8_t i;
+
+	sets = sets * 16;
+	for (i = 0; i < 16; i++) {
+		addre1 = sets + i;
+		addre = addre1 << 16;
+		SPI_SET_SS0_LOW(SPI_FLASH_PORT);       // /CS: active
+		SPI_WRITE(0x06);    // send Command: 0x06, Write enable
+		while (SPI_IS_BUSY(SPI_FLASH_PORT));   // wait tx finish
+		SPI_SET_SS0_HIGH(SPI_FLASH_PORT);      // /CS: de-active
+		SPI_SET_SS0_LOW(SPI_FLASH_PORT);        // /CS: active
+		SPI_WRITE(0xD8);     // send Command: 0xC7, Chip Erase
+
+		SPI_WRITE((addre >> 16) & 0xFF);
+		SPI_WRITE((addre >> 8)  & 0xFF);
+		SPI_WRITE( addre  & 0xFF);
+
+		while (SPI_IS_BUSY(SPI_FLASH_PORT));    // wait tx finish
+		SPI_SET_SS0_HIGH(SPI_FLASH_PORT);       //CS: de-active
+		SPI_ClearRxFIFO(SPI1);
+		SpiFlash_WaitReady_1();
+	}
+
+}

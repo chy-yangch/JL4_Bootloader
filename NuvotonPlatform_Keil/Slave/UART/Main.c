@@ -98,6 +98,7 @@ volatile uint32_t fmc_data;
 
 uint32_t check_aprom_checksum(void);
 void  bin_to_approm (void);
+void default_flash_rom(void);
 
 /* 從Flash讀出序號, 20170407 */
 int FMC_Read1(unsigned int address)
@@ -513,8 +514,8 @@ int32_t main()
 	
     #elif defined(JL4RH)
 	PA->DOUT = 0x00000000;
-	SYS->PA_H_MFP =	0x00000000;
-	SYS->PA_L_MFP =	0x00001200;
+	SYS->PA_H_MFP = 0x00000000;
+	SYS->PA_L_MFP = 0x00001200;
 	PA->PMD =  0x00000005;
 	PA->OFFD = 0x00070000;
 	PA->PUEN = 0x00000000;
@@ -611,10 +612,9 @@ int32_t main()
     APO_PIN = 0;
     TSL_PIN = 0;
     FCS_PIN = 0;   
-    
+ 
     /* Setup SPI1 multi-function pins */
-    SYS->PA_H_MFP = 0x66660000;
-    
+    SYS->PA_H_MFP = 0x66660000;    
     /* Configure as a slave, clock idle low, 32-bit transaction, drive output on falling clock edge and latch input on rising edge. */
     /* Configure SPI1 as a low level active device. */
     /* Default setting: slave selection signal is low level active. */    
@@ -628,9 +628,11 @@ int32_t main()
  
 
     // Flash Test
-    view = SpiFlash_ReadMidDid();
-    view = check_aprom_checksum();
+    //view = SpiFlash_ReadMidDid();
+    //view = check_aprom_checksum();
+    //default_flash_rom();
     bin_to_approm();
+
     //spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
    // SpiFlash_NormalPageProgram(0,0x11223344);	    
     //view = SpiFlash_NormalRead(0);
@@ -684,9 +686,10 @@ int32_t main()
 
 				}
 			} else {
-				if (start_chk == 0)
+				if (start_chk == 0)			//start_chk = 1直接進入APROM
 					start_chk = 1;
 			}
+
 			if ((PA->PIN & 0x00000008) && (start_chk >= 3)) {
 				timer0_start = 1;
 				if (timer0_cnt1 >= 2)
@@ -695,7 +698,6 @@ int32_t main()
 				timer0_start = 0;
 				timer0_cnt1 = 0;
 			}
-		//}/*leon*/
 		
 		if (timer0_cnt >= 60)
 			goto _APROM;
@@ -995,7 +997,8 @@ void  bin_to_approm (void)
 	//uint32_t data_upd_data[128];
 	uint16_t i,j;
 
-	for (i = 0; i < 64; i++) {
+	//更新31.5K,其中0.5K儲存設定值
+	for (i = 0; i < 63; i++) {
 
 		for (j = 0; j < 128; j++)
 			data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
@@ -1004,4 +1007,17 @@ void  bin_to_approm (void)
 
 	}
 
+}
+/*
+ * 寫Flash內定值進行測試
+*/
+void default_flash_rom(void)
+{
+	uint16_t i = 0;
+	
+	SpiFlash_ChipErase_logger(0);
+	
+	for (i = 0; i < 32768; i++)
+		SpiFlash_NormalPageProgram(i,i);
+	
 }

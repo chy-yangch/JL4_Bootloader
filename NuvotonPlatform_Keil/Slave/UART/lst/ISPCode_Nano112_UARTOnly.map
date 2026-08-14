@@ -45,11 +45,11 @@ Section Cross References
     main.o(i.bin_to_approm) refers to fmc.o(i.WriteData) for WriteData
     main.o(i.bin_to_approm) refers to main.o(.bss) for .bss
     main.o(i.check_aprom_checksum) refers to fmc.o(i.ReadData) for ReadData
+    main.o(i.default_flash_rom) refers to w25q32.o(i.SpiFlash_ChipErase_logger) for SpiFlash_ChipErase_logger
+    main.o(i.default_flash_rom) refers to w25q32.o(i.SpiFlash_NormalPageProgram) for SpiFlash_NormalPageProgram
     main.o(i.main) refers to main.o(i.NVIC_SetPriority) for NVIC_SetPriority
     main.o(i.main) refers to fmc.o(i.FMC_Read) for FMC_Read
     main.o(i.main) refers to fmc.o(i.GetDataFlashInfo) for GetDataFlashInfo
-    main.o(i.main) refers to w25q32.o(i.SpiFlash_ReadMidDid) for SpiFlash_ReadMidDid
-    main.o(i.main) refers to main.o(i.check_aprom_checksum) for check_aprom_checksum
     main.o(i.main) refers to main.o(i.bin_to_approm) for bin_to_approm
     main.o(i.main) refers to main.o(i.CLK_SysTickDelay) for CLK_SysTickDelay
     main.o(i.main) refers to main.o(i.__ARM_common_switch8) for __ARM_common_switch8
@@ -71,6 +71,9 @@ Section Cross References
     fmc.o(i.UpdateConfig) refers to fmc.o(i.FMC_Write) for FMC_Write
     fmc.o(i.UpdateConfig) refers to fmc.o(i.FMC_Read) for FMC_Read
     fmc.o(i.WriteData) refers to fmc.o(i.FMC_Write) for FMC_Write
+    w25q32.o(i.SpiFlash_ChipErase_logger) refers to w25q32.o(i.SPI_SET_SS0_LOW) for SPI_SET_SS0_LOW
+    w25q32.o(i.SpiFlash_ChipErase_logger) refers to w25q32.o(i.SPI_SET_SS0_HIGH) for SPI_SET_SS0_HIGH
+    w25q32.o(i.SpiFlash_ChipErase_logger) refers to w25q32.o(i.SpiFlash_WaitReady_1) for SpiFlash_WaitReady_1
     w25q32.o(i.SpiFlash_NormalPageProgram) refers to w25q32.o(i.SPI_SET_SS0_LOW) for SPI_SET_SS0_LOW
     w25q32.o(i.SpiFlash_NormalPageProgram) refers to w25q32.o(i.SPI_SET_SS0_HIGH) for SPI_SET_SS0_HIGH
     w25q32.o(i.SpiFlash_NormalPageProgram) refers to w25q32.o(i.SpiFlash_WaitReady_1) for SpiFlash_WaitReady_1
@@ -113,6 +116,9 @@ Removing Unused input sections from the image.
     Removing startup_nano1x2series.o(HEAP), (512 bytes).
     Removing main.o(.rev16_text), (4 bytes).
     Removing main.o(.revsh_text), (4 bytes).
+    Removing main.o(i.check_aprom_checksum), (58 bytes).
+    Removing main.o(i.default_flash_rom), (32 bytes).
+    Removing main.o(.data), (4 bytes).
     Removing main.o(.data), (4 bytes).
     Removing main.o(.data), (4 bytes).
     Removing fmc.o(.rev16_text), (4 bytes).
@@ -120,12 +126,14 @@ Removing Unused input sections from the image.
     Removing w25q32.o(.rev16_text), (4 bytes).
     Removing w25q32.o(.revsh_text), (4 bytes).
     Removing w25q32.o(i.SPI_ClearRxFIFO), (10 bytes).
+    Removing w25q32.o(i.SpiFlash_ChipErase_logger), (104 bytes).
     Removing w25q32.o(i.SpiFlash_NormalPageProgram), (116 bytes).
+    Removing w25q32.o(i.SpiFlash_ReadMidDid), (72 bytes).
     Removing w25q32.o(i.SpiFlash_ReadStatusReg), (44 bytes).
     Removing w25q32.o(i.SpiFlash_WaitReady_1), (14 bytes).
     Removing w25q32.o(i.spi_flash_erase), (92 bytes).
 
-19 unused section(s) (total 988 bytes) removed from the image.
+24 unused section(s) (total 1258 bytes) removed from the image.
 
 ==============================================================================
 
@@ -137,19 +145,19 @@ Image Symbol Table
 
     RESET                                    0x00000000   Section      192  startup_nano1x2series.o(RESET)
     ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
     ..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\ARM\startup_Nano1X2Series.s 0x00000000   Number         0  startup_nano1x2series.o ABSOLUTE
     ..\..\..\Library\Device\Nuvoton\Nano1X2Series\Source\system_Nano1X2Series.c 0x00000000   Number         0  system_nano1x2series.o ABSOLUTE
     ..\\..\\..\\Library\\Device\\Nuvoton\\Nano1X2Series\\Source\\system_Nano1X2Series.c 0x00000000   Number         0  system_nano1x2series.o ABSOLUTE
@@ -196,22 +204,20 @@ Image Symbol Table
     i.SPI_SET_SS0_LOW                        0x00000644   Section        0  w25q32.o(i.SPI_SET_SS0_LOW)
     SPI_SET_SS0_LOW                          0x00000645   Thumb Code    36  w25q32.o(i.SPI_SET_SS0_LOW)
     i.SpiFlash_NormalRead                    0x00000668   Section        0  w25q32.o(i.SpiFlash_NormalRead)
-    i.SpiFlash_ReadMidDid                    0x000006fc   Section        0  w25q32.o(i.SpiFlash_ReadMidDid)
-    i.SysTimerDelay                          0x00000744   Section        0  main.o(i.SysTimerDelay)
-    i.TMR0_IRQHandler                        0x00000764   Section        0  main.o(i.TMR0_IRQHandler)
-    i.TMR1_IRQHandler                        0x000007b0   Section        0  main.o(i.TMR1_IRQHandler)
-    i.UART1_IRQHandler                       0x000007dc   Section        0  main.o(i.UART1_IRQHandler)
-    i.UpdateConfig                           0x00000854   Section        0  fmc.o(i.UpdateConfig)
-    i.WriteData                              0x000008a4   Section        0  fmc.o(i.WriteData)
-    i.__ARM_common_switch8                   0x000008c0   Section        0  main.o(i.__ARM_common_switch8)
-    i.__scatterload_copy                     0x000008da   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x000008e8   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x000008ea   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.bin_to_approm                          0x000008f8   Section        0  main.o(i.bin_to_approm)
-    i.check_aprom_checksum                   0x00000930   Section        0  main.o(i.check_aprom_checksum)
-    i.main                                   0x0000096c   Section        0  main.o(i.main)
+    i.SysTimerDelay                          0x000006fc   Section        0  main.o(i.SysTimerDelay)
+    i.TMR0_IRQHandler                        0x0000071c   Section        0  main.o(i.TMR0_IRQHandler)
+    i.TMR1_IRQHandler                        0x00000768   Section        0  main.o(i.TMR1_IRQHandler)
+    i.UART1_IRQHandler                       0x00000794   Section        0  main.o(i.UART1_IRQHandler)
+    i.UpdateConfig                           0x0000080c   Section        0  fmc.o(i.UpdateConfig)
+    i.WriteData                              0x0000085c   Section        0  fmc.o(i.WriteData)
+    i.__ARM_common_switch8                   0x00000878   Section        0  main.o(i.__ARM_common_switch8)
+    i.__scatterload_copy                     0x00000892   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x000008a0   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x000008a2   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.bin_to_approm                          0x000008b0   Section        0  main.o(i.bin_to_approm)
+    i.main                                   0x000008e8   Section        0  main.o(i.main)
     .data                                    0x20000000   Section        8  system_nano1x2series.o(.data)
-    .data                                    0x20000008   Section       88  main.o(.data)
+    .data                                    0x20000008   Section       84  main.o(.data)
     g_UARTIRQ                                0x20000009   Data           1  main.o(.data)
     bufhead                                  0x2000000a   Data           1  main.o(.data)
     g_pUART                                  0x20000018   Data           4  main.o(.data)
@@ -222,10 +228,10 @@ Image Symbol Table
     LastDataLen                              0x2000002c   Data           4  main.o(.data)
     g_packno                                 0x20000030   Data           4  main.o(.data)
     gcmd                                     0x20000034   Data           4  main.o(.data)
-    .bss                                     0x20000060   Section     1152  main.o(.bss)
-    uart_rcvbuf                              0x20000060   Data          64  main.o(.bss)
-    uart_sendbuf                             0x200000a0   Data          64  main.o(.bss)
-    aprom_buf                                0x200000e0   Data         512  main.o(.bss)
+    .bss                                     0x2000005c   Section     1152  main.o(.bss)
+    uart_rcvbuf                              0x2000005c   Data          64  main.o(.bss)
+    uart_sendbuf                             0x2000009c   Data          64  main.o(.bss)
+    aprom_buf                                0x200000dc   Data         512  main.o(.bss)
     STACK                                    0x200004e0   Section     1280  startup_nano1x2series.o(STACK)
 
     Global Symbols
@@ -293,22 +299,20 @@ Image Symbol Table
     PutString                                0x000005d9   Thumb Code    34  main.o(i.PutString)
     ReadData                                 0x00000605   Thumb Code    28  fmc.o(i.ReadData)
     SpiFlash_NormalRead                      0x00000669   Thumb Code   144  w25q32.o(i.SpiFlash_NormalRead)
-    SpiFlash_ReadMidDid                      0x000006fd   Thumb Code    68  w25q32.o(i.SpiFlash_ReadMidDid)
-    SysTimerDelay                            0x00000745   Thumb Code    26  main.o(i.SysTimerDelay)
-    TMR0_IRQHandler                          0x00000765   Thumb Code    60  main.o(i.TMR0_IRQHandler)
-    TMR1_IRQHandler                          0x000007b1   Thumb Code    32  main.o(i.TMR1_IRQHandler)
-    UART1_IRQHandler                         0x000007dd   Thumb Code   110  main.o(i.UART1_IRQHandler)
-    UpdateConfig                             0x00000855   Thumb Code    70  fmc.o(i.UpdateConfig)
-    WriteData                                0x000008a5   Thumb Code    28  fmc.o(i.WriteData)
-    __ARM_common_switch8                     0x000008c1   Thumb Code    26  main.o(i.__ARM_common_switch8)
-    __scatterload_copy                       0x000008db   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x000008e9   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x000008eb   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    bin_to_approm                            0x000008f9   Thumb Code    52  main.o(i.bin_to_approm)
-    check_aprom_checksum                     0x00000931   Thumb Code    58  main.o(i.check_aprom_checksum)
-    main                                     0x0000096d   Thumb Code  1484  main.o(i.main)
-    Region$$Table$$Base                      0x00000f54   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000f74   Number         0  anon$$obj.o(Region$$Table)
+    SysTimerDelay                            0x000006fd   Thumb Code    26  main.o(i.SysTimerDelay)
+    TMR0_IRQHandler                          0x0000071d   Thumb Code    60  main.o(i.TMR0_IRQHandler)
+    TMR1_IRQHandler                          0x00000769   Thumb Code    32  main.o(i.TMR1_IRQHandler)
+    UART1_IRQHandler                         0x00000795   Thumb Code   110  main.o(i.UART1_IRQHandler)
+    UpdateConfig                             0x0000080d   Thumb Code    70  fmc.o(i.UpdateConfig)
+    WriteData                                0x0000085d   Thumb Code    28  fmc.o(i.WriteData)
+    __ARM_common_switch8                     0x00000879   Thumb Code    26  main.o(i.__ARM_common_switch8)
+    __scatterload_copy                       0x00000893   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x000008a1   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x000008a3   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    bin_to_approm                            0x000008b1   Thumb Code    52  main.o(i.bin_to_approm)
+    main                                     0x000008e9   Thumb Code  1470  main.o(i.main)
+    Region$$Table$$Base                      0x00000ec4   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00000ee4   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000000   Data           4  system_nano1x2series.o(.data)
     CyclesPerUs                              0x20000004   Data           4  system_nano1x2series.o(.data)
     start_chk                                0x20000008   Data           1  main.o(.data)
@@ -326,8 +330,7 @@ Image Symbol Table
     g_timecnt                                0x20000050   Data           4  main.o(.data)
     lcmd_reg                                 0x20000054   Data           4  main.o(.data)
     fmc_data                                 0x20000058   Data           4  main.o(.data)
-    view                                     0x2000005c   Data           4  main.o(.data)
-    data_upd_data                            0x200002e0   Data         512  main.o(.bss)
+    data_upd_data                            0x200002dc   Data         512  main.o(.bss)
     __initial_sp                             0x200009e0   Data           0  startup_nano1x2series.o(STACK)
 
 
@@ -338,72 +341,70 @@ Memory Map of the image
 
   Image Entry point : 0x000000d5
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000fd4, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000f40, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000f74, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000ee4, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x00000000   0x00000000   0x000000c0   Data   RO           65    RESET               startup_nano1x2series.o
-    0x000000c0   0x000000c0   0x00000000   Code   RO          338  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
-    0x000000c0   0x000000c0   0x00000004   Code   RO          341    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
-    0x000000c4   0x000000c4   0x00000004   Code   RO          344    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
-    0x000000c8   0x000000c8   0x00000000   Code   RO          346    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
-    0x000000c8   0x000000c8   0x00000000   Code   RO          348    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
-    0x000000c8   0x000000c8   0x00000008   Code   RO          349    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
-    0x000000d0   0x000000d0   0x00000000   Code   RO          351    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
-    0x000000d0   0x000000d0   0x00000000   Code   RO          353    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
-    0x000000d0   0x000000d0   0x00000004   Code   RO          342    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
+    0x000000c0   0x000000c0   0x00000000   Code   RO          351  * .ARM.Collect$$$$00000000  mc_p.l(entry.o)
+    0x000000c0   0x000000c0   0x00000004   Code   RO          354    .ARM.Collect$$$$00000001  mc_p.l(entry2.o)
+    0x000000c4   0x000000c4   0x00000004   Code   RO          357    .ARM.Collect$$$$00000004  mc_p.l(entry5.o)
+    0x000000c8   0x000000c8   0x00000000   Code   RO          359    .ARM.Collect$$$$00000008  mc_p.l(entry7b.o)
+    0x000000c8   0x000000c8   0x00000000   Code   RO          361    .ARM.Collect$$$$0000000A  mc_p.l(entry8b.o)
+    0x000000c8   0x000000c8   0x00000008   Code   RO          362    .ARM.Collect$$$$0000000B  mc_p.l(entry9a.o)
+    0x000000d0   0x000000d0   0x00000000   Code   RO          364    .ARM.Collect$$$$0000000D  mc_p.l(entry10a.o)
+    0x000000d0   0x000000d0   0x00000000   Code   RO          366    .ARM.Collect$$$$0000000F  mc_p.l(entry11a.o)
+    0x000000d0   0x000000d0   0x00000004   Code   RO          355    .ARM.Collect$$$$00002712  mc_p.l(entry2.o)
     0x000000d4   0x000000d4   0x00000054   Code   RO           66  * .text               startup_nano1x2series.o
-    0x00000128   0x00000128   0x00000024   Code   RO          355    .text               mc_p.l(init.o)
+    0x00000128   0x00000128   0x00000024   Code   RO          368    .text               mc_p.l(init.o)
     0x0000014c   0x0000014c   0x0000001c   Code   RO           72    i.BLE_sleep         main.o
     0x00000168   0x00000168   0x00000028   Code   RO           73    i.BLE_wakeup        main.o
     0x00000190   0x00000190   0x00000024   Code   RO           74    i.CLK_SysTickDelay  main.o
     0x000001b4   0x000001b4   0x00000018   Code   RO           75    i.Checksum          main.o
-    0x000001cc   0x000001cc   0x00000028   Code   RO          203    i.EraseAP           fmc.o
-    0x000001f4   0x000001f4   0x00000028   Code   RO          204    i.FMC_Erase         fmc.o
-    0x0000021c   0x0000021c   0x0000002c   Code   RO          205    i.FMC_Read          fmc.o
+    0x000001cc   0x000001cc   0x00000028   Code   RO          210    i.EraseAP           fmc.o
+    0x000001f4   0x000001f4   0x00000028   Code   RO          211    i.FMC_Erase         fmc.o
+    0x0000021c   0x0000021c   0x0000002c   Code   RO          212    i.FMC_Read          fmc.o
     0x00000248   0x00000248   0x00000034   Code   RO           76    i.FMC_Read1         main.o
-    0x0000027c   0x0000027c   0x00000028   Code   RO          206    i.FMC_Write         fmc.o
-    0x000002a4   0x000002a4   0x00000054   Code   RO          207    i.GetDataFlashInfo  fmc.o
+    0x0000027c   0x0000027c   0x00000028   Code   RO          213    i.FMC_Write         fmc.o
+    0x000002a4   0x000002a4   0x00000054   Code   RO          214    i.GetDataFlashInfo  fmc.o
     0x000002f8   0x000002f8   0x00000044   Code   RO           77    i.NVIC_SetPriority  main.o
     0x0000033c   0x0000033c   0x0000029c   Code   RO           78    i.ParseCmd          main.o
     0x000005d8   0x000005d8   0x0000002c   Code   RO           79    i.PutString         main.o
-    0x00000604   0x00000604   0x0000001c   Code   RO          208    i.ReadData          fmc.o
-    0x00000620   0x00000620   0x00000024   Code   RO          273    i.SPI_SET_SS0_HIGH  w25q32.o
-    0x00000644   0x00000644   0x00000024   Code   RO          274    i.SPI_SET_SS0_LOW   w25q32.o
-    0x00000668   0x00000668   0x00000094   Code   RO          276    i.SpiFlash_NormalRead  w25q32.o
-    0x000006fc   0x000006fc   0x00000048   Code   RO          277    i.SpiFlash_ReadMidDid  w25q32.o
-    0x00000744   0x00000744   0x00000020   Code   RO           80    i.SysTimerDelay     main.o
-    0x00000764   0x00000764   0x0000004c   Code   RO           81    i.TMR0_IRQHandler   main.o
-    0x000007b0   0x000007b0   0x0000002c   Code   RO           82    i.TMR1_IRQHandler   main.o
-    0x000007dc   0x000007dc   0x00000078   Code   RO           83    i.UART1_IRQHandler  main.o
-    0x00000854   0x00000854   0x00000050   Code   RO          209    i.UpdateConfig      fmc.o
-    0x000008a4   0x000008a4   0x0000001c   Code   RO          210    i.WriteData         fmc.o
-    0x000008c0   0x000008c0   0x0000001a   Code   RO          170    i.__ARM_common_switch8  main.o
-    0x000008da   0x000008da   0x0000000e   Code   RO          359    i.__scatterload_copy  mc_p.l(handlers.o)
-    0x000008e8   0x000008e8   0x00000002   Code   RO          360    i.__scatterload_null  mc_p.l(handlers.o)
-    0x000008ea   0x000008ea   0x0000000e   Code   RO          361    i.__scatterload_zeroinit  mc_p.l(handlers.o)
-    0x000008f8   0x000008f8   0x00000038   Code   RO           84    i.bin_to_approm     main.o
-    0x00000930   0x00000930   0x0000003a   Code   RO           85    i.check_aprom_checksum  main.o
-    0x0000096a   0x0000096a   0x00000002   PAD
-    0x0000096c   0x0000096c   0x000005e8   Code   RO           86    i.main              main.o
-    0x00000f54   0x00000f54   0x00000020   Data   RO          357    Region$$Table       anon$$obj.o
+    0x00000604   0x00000604   0x0000001c   Code   RO          215    i.ReadData          fmc.o
+    0x00000620   0x00000620   0x00000024   Code   RO          280    i.SPI_SET_SS0_HIGH  w25q32.o
+    0x00000644   0x00000644   0x00000024   Code   RO          281    i.SPI_SET_SS0_LOW   w25q32.o
+    0x00000668   0x00000668   0x00000094   Code   RO          284    i.SpiFlash_NormalRead  w25q32.o
+    0x000006fc   0x000006fc   0x00000020   Code   RO           80    i.SysTimerDelay     main.o
+    0x0000071c   0x0000071c   0x0000004c   Code   RO           81    i.TMR0_IRQHandler   main.o
+    0x00000768   0x00000768   0x0000002c   Code   RO           82    i.TMR1_IRQHandler   main.o
+    0x00000794   0x00000794   0x00000078   Code   RO           83    i.UART1_IRQHandler  main.o
+    0x0000080c   0x0000080c   0x00000050   Code   RO          216    i.UpdateConfig      fmc.o
+    0x0000085c   0x0000085c   0x0000001c   Code   RO          217    i.WriteData         fmc.o
+    0x00000878   0x00000878   0x0000001a   Code   RO          177    i.__ARM_common_switch8  main.o
+    0x00000892   0x00000892   0x0000000e   Code   RO          372    i.__scatterload_copy  mc_p.l(handlers.o)
+    0x000008a0   0x000008a0   0x00000002   Code   RO          373    i.__scatterload_null  mc_p.l(handlers.o)
+    0x000008a2   0x000008a2   0x0000000e   Code   RO          374    i.__scatterload_zeroinit  mc_p.l(handlers.o)
+    0x000008b0   0x000008b0   0x00000038   Code   RO           84    i.bin_to_approm     main.o
+    0x000008e8   0x000008e8   0x000005dc   Code   RO           87    i.main              main.o
+    0x00000ec4   0x00000ec4   0x00000020   Data   RO          370    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000f74, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000ee4, Size: 0x0000005c, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x00000f74   0x00000008   Data   RW            6    .data               system_nano1x2series.o
-    0x20000008   0x00000f7c   0x00000058   Data   RW           88    .data               main.o
+    0x20000000   0x00000ee4   0x00000008   Data   RW            6    .data               system_nano1x2series.o
+    0x20000008   0x00000eec   0x00000054   Data   RW           89    .data               main.o
 
 
-    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000fd4, Size: 0x00000980, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x2000005c, Load base: 0x00000f40, Size: 0x00000984, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000060        -       0x00000480   Zero   RW           87    .bss                main.o
+    0x2000005c        -       0x00000480   Zero   RW           88    .bss                main.o
+    0x200004dc   0x00000f40   0x00000004   PAD
     0x200004e0        -       0x00000500   Zero   RW           63    STACK               startup_nano1x2series.o
 
 
@@ -415,15 +416,15 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        384         36          0          0          0       5370   fmc.o
-      2884        290          0         88       1152     107838   main.o
+      2814        294          0         84       1152     107143   main.o
         84         34        192          0       1280        756   startup_nano1x2series.o
          0          0          0          8          0       4898   system_nano1x2series.o
-       292          8          0          0          0       6411   w25q32.o
+       220          4          0          0          0       5477   w25q32.o
 
     ----------------------------------------------------------------------
-      3646        368        224         96       2432     125273   Object Totals
+      3502        368        224         92       2436     123644   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         2          0          0          0          0          0   (incl. Padding)
+         0          0          0          0          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -460,15 +461,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      3732        384        224         96       2432     124481   Grand Totals
-      3732        384        224         96       2432     124481   ELF Image Totals
-      3732        384        224         96          0          0   ROM Totals
+      3588        384        224         92       2436     122940   Grand Totals
+      3588        384        224         92       2436     122940   ELF Image Totals
+      3588        384        224         92          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 3956 (   3.86kB)
+    Total RO  Size (Code + RO Data)                 3812 (   3.72kB)
     Total RW  Size (RW Data + ZI Data)              2528 (   2.47kB)
-    Total ROM Size (Code + RO Data + RW Data)       4052 (   3.96kB)
+    Total ROM Size (Code + RO Data + RW Data)       3904 (   3.81kB)
 
 ==============================================================================
 
