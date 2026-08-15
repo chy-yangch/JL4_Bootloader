@@ -240,8 +240,8 @@ Image Symbol Table
     i.ble_ota_step_function                  0x00000c04   Section        0  main.o(i.ble_ota_step_function)
     i.check_aprom_checksum                   0x00000c5c   Section        0  main.o(i.check_aprom_checksum)
     i.main                                   0x00000c98   Section        0  main.o(i.main)
-    i.wait_cmd_m_ack                         0x00000e30   Section        0  main.o(i.wait_cmd_m_ack)
-    i.wait_meter_tyep_check                  0x00000e5c   Section        0  main.o(i.wait_meter_tyep_check)
+    i.wait_cmd_m_ack                         0x00000e54   Section        0  main.o(i.wait_cmd_m_ack)
+    i.wait_meter_tyep_check                  0x00000e80   Section        0  main.o(i.wait_meter_tyep_check)
     .data                                    0x20000000   Section        8  system_nano1x2series.o(.data)
     .data                                    0x20000008   Section       88  main.o(.data)
     g_UARTIRQ                                0x20000009   Data           1  main.o(.data)
@@ -341,11 +341,11 @@ Image Symbol Table
     ble_ota_io_init                          0x00000bb5   Thumb Code    54  main.o(i.ble_ota_io_init)
     ble_ota_step_function                    0x00000c05   Thumb Code    82  main.o(i.ble_ota_step_function)
     check_aprom_checksum                     0x00000c5d   Thumb Code    58  main.o(i.check_aprom_checksum)
-    main                                     0x00000c99   Thumb Code   376  main.o(i.main)
-    wait_cmd_m_ack                           0x00000e31   Thumb Code    32  main.o(i.wait_cmd_m_ack)
-    wait_meter_tyep_check                    0x00000e5d   Thumb Code   120  main.o(i.wait_meter_tyep_check)
-    Region$$Table$$Base                      0x00000edc   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000efc   Number         0  anon$$obj.o(Region$$Table)
+    main                                     0x00000c99   Thumb Code   400  main.o(i.main)
+    wait_cmd_m_ack                           0x00000e55   Thumb Code    32  main.o(i.wait_cmd_m_ack)
+    wait_meter_tyep_check                    0x00000e81   Thumb Code   120  main.o(i.wait_meter_tyep_check)
+    Region$$Table$$Base                      0x00000f00   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00000f20   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000000   Data           4  system_nano1x2series.o(.data)
     CyclesPerUs                              0x20000004   Data           4  system_nano1x2series.o(.data)
     start_chk                                0x20000008   Data           1  main.o(.data)
@@ -378,9 +378,9 @@ Memory Map of the image
 
   Image Entry point : 0x000000d5
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000f5c, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000f80, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000efc, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000f20, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -430,21 +430,21 @@ Memory Map of the image
     0x00000c04   0x00000c04   0x00000058   Code   RO           88    i.ble_ota_step_function  main.o
     0x00000c5c   0x00000c5c   0x0000003a   Code   RO           89    i.check_aprom_checksum  main.o
     0x00000c96   0x00000c96   0x00000002   PAD
-    0x00000c98   0x00000c98   0x00000198   Code   RO           91    i.main              main.o
-    0x00000e30   0x00000e30   0x0000002c   Code   RO           92    i.wait_cmd_m_ack    main.o
-    0x00000e5c   0x00000e5c   0x00000080   Code   RO           93    i.wait_meter_tyep_check  main.o
-    0x00000edc   0x00000edc   0x00000020   Data   RO          407    Region$$Table       anon$$obj.o
+    0x00000c98   0x00000c98   0x000001bc   Code   RO           91    i.main              main.o
+    0x00000e54   0x00000e54   0x0000002c   Code   RO           92    i.wait_cmd_m_ack    main.o
+    0x00000e80   0x00000e80   0x00000080   Code   RO           93    i.wait_meter_tyep_check  main.o
+    0x00000f00   0x00000f00   0x00000020   Data   RO          407    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000efc, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000f20, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x00000efc   0x00000008   Data   RW            6    .data               system_nano1x2series.o
-    0x20000008   0x00000f04   0x00000058   Data   RW           95    .data               main.o
+    0x20000000   0x00000f20   0x00000008   Data   RW            6    .data               system_nano1x2series.o
+    0x20000008   0x00000f28   0x00000058   Data   RW           95    .data               main.o
 
 
-    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000f5c, Size: 0x00000980, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000f80, Size: 0x00000980, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -460,13 +460,13 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        384         36          0          0          0       5370   fmc.o
-      2836        344          0         88       1152     110930   main.o
+      2872        356          0         88       1152     110950   main.o
         84         34        192          0       1280        756   startup_nano1x2series.o
          0          0          0          8          0       4898   system_nano1x2series.o
        220          4          0          0          0       5477   w25q32.o
 
     ----------------------------------------------------------------------
-      3526        418        224         96       2432     127431   Object Totals
+      3562        430        224         96       2432     127451   Object Totals
          0          0         32          0          0          0   (incl. Generated)
          2          0          0          0          0          0   (incl. Padding)
 
@@ -505,15 +505,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      3612        434        224         96       2432     126419   Grand Totals
-      3612        434        224         96       2432     126419   ELF Image Totals
-      3612        434        224         96          0          0   ROM Totals
+      3648        446        224         96       2432     126439   Grand Totals
+      3648        446        224         96       2432     126439   ELF Image Totals
+      3648        446        224         96          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 3836 (   3.75kB)
+    Total RO  Size (Code + RO Data)                 3872 (   3.78kB)
     Total RW  Size (RW Data + ZI Data)              2528 (   2.47kB)
-    Total ROM Size (Code + RO Data + RW Data)       3932 (   3.84kB)
+    Total ROM Size (Code + RO Data + RW Data)       3968 (   3.88kB)
 
 ==============================================================================
 

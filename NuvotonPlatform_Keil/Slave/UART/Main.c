@@ -63,6 +63,10 @@
 #define POW_KEY			PA3
 #define BLE_LED			PD9
 
+//#define RTC_SPR_BASE        0x40008000UL
+//#define RTC_RWEN        	(*(volatile uint32_t *)(RTC_SPR_BASE + 0x20))
+//#define RTC_SPR(n)      		(*(volatile uint32_t *)(RTC_SPR_BASE + 0x40 + ((n) * 4)))
+
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
 __align(4) static uint8_t uart_rcvbuf[64];
@@ -490,8 +494,26 @@ int32_t main()
 
 	SYS_Init();
  
-	if (approm_update)
+	/* Write 80-byte spare RAM */
+	//RTC_RWEN = 0x0000A965;
+	//RTC_SPR(0) = 0x12345678;
+	//RTC_SPR(1) = 0xABCDEF01;
+	//RTC_SPR(2) = 0x00000055;
+	
+	// Enable Write RTC RAM
+	RTC->CAR = 0x0000A965;
+	//Write RTC RAM
+	//RTC->SPR0 = 0x12345678;
+	RTC->SPR1 = 0xABCDEF01;
+	//Read RTC RAM	
+	approm_update = RTC->SPR0;	
+	
+	if (approm_update) {
+
 		bin_to_approm();
+		RTC->CAR = 0x0000A965;
+		RTC->SPR0 = 0;
+	}
 	
 	// Flash Test
 	//view = SpiFlash_ReadMidDid();
@@ -500,12 +522,13 @@ int32_t main()
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
 	flash_checksum = SpiFlash_NormalRead(0);
-	
 
+
+	
 	if (approm_checksum != flash_checksum)
 		goto _CHECK_ERR;
 	
-
+	
 	if((POW_KEY) && (test_key == 1)) {
 
 _CHECK_ERR:
@@ -726,7 +749,7 @@ void SYS_Init (void)
 	}
 	/* reseaved bit defined in main : enable 10kHz */
 	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
-	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN;
+	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN | CLK_APBCLK_RTC_EN;
 
     #if defined(JL4PR)
 	PA->DOUT = 0x00000000;
