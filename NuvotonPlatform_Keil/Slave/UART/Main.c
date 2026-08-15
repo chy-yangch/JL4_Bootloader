@@ -479,27 +479,37 @@ void CLK_SysTickDelay(uint32_t us)
 	while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0);
 }
 __IO uint32_t view,test_key = 1;
+__IO uint8_t approm_update = 0;
+
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
 	uint8_t   i;
+	uint32_t flash_checksum,approm_checksum;
 
 	SYS_Init();
  
-
+	if (approm_update)
+		bin_to_approm();
+	
 	// Flash Test
 	//view = SpiFlash_ReadMidDid();
-	view = check_aprom_checksum();
+	approm_checksum = check_aprom_checksum();
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
-	//view = SpiFlash_NormalRead(0);
-	//bin_to_approm();
+	flash_checksum = SpiFlash_NormalRead(0);
+	
+
+	if (approm_checksum != flash_checksum)
+		goto _CHECK_ERR;
 	
 
 	if((POW_KEY) && (test_key == 1)) {
 
+_CHECK_ERR:
+		
 		while (1) {
 			ble_ota_step_function();
 			if (ble_ota_step == 4)
@@ -510,220 +520,7 @@ int32_t main()
 		goto _APROM;
 	
 	}
-	
 
-	
-/*
-	while (1) {
-
-			if ((PA->PIN & 0x00000008) && (start_chk == 0)) {
-				if (timer0_cnt >= 5) {
-					start_chk = 2;
-					timer0_cnt = 0;
-					PD->DOUT |= BIT9;
-					
-				} else if (timer0_cnt >= 3){
-					
-				#if defined(JL4PR)
-					
-					PC->DOUT = 0x00000010;
-					PC->PMD  = 0x10001100;
-					CLK_SysTickDelay(500000); // 5 us
-
-					SYS->PC_H_MFP = 0x00000007;
-					SYS->PC_L_MFP = 0x70000000;
-					PC->DOUT |= BIT6;
-					PC->OFFD = 0x00000000;
-					PC->PUEN = 0x00000200;					
-					
-				#elif defined(JL4RH)
-					
-					PC->DOUT = 0x00000050;
-					PC->PMD  = 0x10001100;
-					CLK_SysTickDelay(500000); // 5 us
-
-					SYS->PC_H_MFP = 0x00000007;
-					SYS->PC_L_MFP = 0x70000000;
-					PC->DOUT |= BIT6;
-						
-				#elif defined(JL4PC)
-				
-					PC->DOUT = 0x00000050;
-					PC->PMD  = 0x10001101;
-					CLK_SysTickDelay(500000); // 5 us
-					SYS->PC_H_MFP = 0x00000007;
-					SYS->PC_L_MFP = 0x70000003;
-					PC->DOUT |= BIT6;
-					PC->OFFD = 0x00000000;
-					PC->PUEN = 0x00000000;					
-				#else
-				 __NOP();
-				 __NOP();
-				#endif
-
-				}
-			} else {
-				if (start_chk == 0)			//start_chk = 1直接進入APROM
-					start_chk = 1;
-			}
-
-			if ((PA->PIN & 0x00000008) && (start_chk >= 3)) {
-				timer0_start = 1;
-				if (timer0_cnt1 >= 2)
-					goto _RST;
-			} else {
-				timer0_start = 0;
-				timer0_cnt1 = 0;
-			}
-		
-		if (timer0_cnt >= 60)
-			goto _APROM;
-
-		switch (start_chk) {
-		case 1:
-			if ((bufhead >= 4) || (bUartDataReady == TRUE)) {
-				lcmd = inpw(uart_rcvbuf);
-				if (lcmd == CMD_CONNECT)
-					goto _ISP;
-				else {
-					bUartDataReady = FALSE;
-					bufhead = 0;
-				}
-			}
-			if ((SysTick->CTRL & (1 << 16)) != 0) {
-				__NOP();
-				goto _APROM;
-			}
-			break;
-		case 2:
-			BLE_wakeup();
-			for (i = 0; i < 10; i++)
-				uart_sendbuf[i] = 0;
-
-			FMC_Read1(0x7A00);
-			if (fmc_data == 0xFFFFFFFF) {
-				FMC_Read1(0x79FC);
-
-				uart_sendbuf[3] =
-					(uint8_t)(fmc_data & 0x000000FF);
-				uart_sendbuf[4] =
-					(int8_t)((fmc_data & 0x0000FF00) >> 8);
-				uart_sendbuf[5] =
-					(int8_t)((fmc_data & 0x00FF0000) >> 16);
-				uart_sendbuf[6] =
-					(int8_t)((fmc_data & 0xFF000000) >> 24);
-			} else {
-				for (i = 0; i < 6; i++) {
-					FMC_Read1(0x7A00 + i * 4);
-					uart_sendbuf[3 + i] = (uint8_t)fmc_data;
-				}
-			}
-			uart_sendbuf[0] = '#';
-			uart_sendbuf[1] = 14;
-			uart_sendbuf[2] = 'M';
-			uart_sendbuf[7] = 'A';
-			uart_sendbuf[8] = 'A';
-			
-			#if defined(JL4PR)
-				uart_sendbuf[9] = 'B';
-				uart_sendbuf[10] = 'G';
-			#elif defined(JL4RH)
-				uart_sendbuf[9] = 'B';
-				uart_sendbuf[10] = 'H';
-			#elif defined(JL4PC)
-				uart_sendbuf[9] = 'B';
-				uart_sendbuf[10] = 'F'			
-			#else
-			 __NOP();
-			 __NOP();
-			#endif
-
-			for (i = 0; i < uart_sendbuf[1] - 3; i++)
-				uart_sendbuf[uart_sendbuf[1] - 3] +=
-				uart_sendbuf[i];
-
-			uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
-			uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
-			bufhead = 0;
-			PutString(uart_sendbuf[1]);
-			BLE_sleep();
-			start_chk = 3;
-			break;
-		case 3:
-			if (bUartDataReady == TRUE && uart_rcvbuf[2] == 'M') {
-				bUartDataReady = FALSE;
-				start_chk = 4;
-				PC->DOUT &= ~BIT6;
-			} else {
-				start_chk = 2;
-			}
-
-			break;
-		case 4:
-			if (bUartDataReady == TRUE) {
-				bUartDataReady = FALSE;
-				if (uart_rcvbuf[2] == 'E') {
-					for (i = 0; i < 12; i++)
-						uart_sendbuf[i] = 0;
-				}
-				uart_sendbuf[0] = '#';
-				uart_sendbuf[1] = 10;
-				uart_sendbuf[2] = 'E';
-				uart_sendbuf[3] = 'A';
-				uart_sendbuf[4] = 'A';
-				
-				#if defined(JL4PR)
-					uart_sendbuf[5] = 'B';
-					uart_sendbuf[6] = 'G';
-				#elif defined(JL4RH)
-					uart_sendbuf[5] = 'B';
-					uart_sendbuf[6] = 'H';
-				#elif defined(JL4PC)
-					uart_sendbuf[5] = 'B';
-					uart_sendbuf[6] = 'F';
-				#else
-				 __NOP();
-				 __NOP();
-				#endif
-
-				for (i = 0; i < uart_sendbuf[1] - 3; i++)
-					uart_sendbuf[uart_sendbuf[1] - 3] +=
-						uart_sendbuf[i];
-				uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
-				uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
-				PutString(uart_sendbuf[1]);
-				start_chk = 5;
-			}
-			break;
-		case 5:
-			start_chk = 6;
-			timer0_start = 0;
-			timer0_cnt = 0;
-			goto _ISP;
-
-			break;
-
-		}
-	}
-//#endif
-*/
-
-#ifdef SUPPORT_WRITECKSUM
-	CheckCksumBase();
-
-	FMC_Read(g_ckbase, &totallen);
-	FMC_Read(g_ckbase + 4, &cksum);
-
-	if ((pinst == 0) || ((SYS->RST_SRC & 0x3) == 0x00))
-		|| (totallen > g_apromSize) ||
-		(CalCheckSum(0x0, totallen) !=
-		 cksum))//if GPIO low or SYSRESETREQ reset or checksum error, run ISP
-#else
-// 	  if ((pinst == 0) || ((SYS->RST_SRC & 0x3) == 0x00))
-	//if GPIO low or SYSRESETREQ reset, run ISP
-#endif
-
-	{
 _APROM:
 
 		SYS->RST_SRC = 3;
@@ -731,7 +528,7 @@ _APROM:
 		SCB->AIRCR = (V6M_AIRCR_VECTKEY_DATA | V6M_AIRCR_SYSRESETREQ);
 		/* Trap the CPU */
 		while (1);
-	}
+	
 _RST:
 	SYS->RST_SRC = 3;
 	i = (inpw(&FMC->ISPCON) & 0xFFFFFFFC);
@@ -1260,7 +1057,7 @@ void ble_ota_step_function (void)
 			
 			if(wait_meter_tyep_check()) 
 				ble_ota_step = 4;
-		
+
 			break;
 		
 		case 4 :
