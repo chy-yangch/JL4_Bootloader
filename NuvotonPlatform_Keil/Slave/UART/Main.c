@@ -24,41 +24,44 @@
 
 #define CMD_UPDATE_APROM	0x000000A0
 #define CMD_UPDATE_CONFIG	0x000000A1
-#define CMD_READ_CONFIG		0x000000A2
+#define CMD_READ_CONFIG	0x000000A2
 #define CMD_ERASE_ALL		0x000000A3
-#define CMD_SYNC_PACKNO		0x000000A4
+#define CMD_SYNC_PACKNO	0x000000A4
 #define CMD_GET_FWVER		0x000000A6
 #define CMD_RUN_APROM		0x000000AB
 #define CMD_RUN_LDROM		0x000000AC
-#define CMD_RESET		0x000000AD
+#define CMD_RESET			0x000000AD
 #define CMD_CONNECT		0x000000AE
 #define CMD_DISCONNECT		0x000000AF
 
 #define CMD_GET_DEVICEID	0x000000B1
 
-#define CMD_UPDATE_DATAFLASH 	0x000000C3
-#define CMD_WRITE_CHECKSUM 	0x000000C9
-#define CMD_GET_FLASHMODE 	0x000000CA
+#define CMD_UPDATE_DATAFLASH	0x000000C3
+#define CMD_WRITE_CHECKSUM	0x000000C9
+#define CMD_GET_FLASHMODE		0x000000CA
 
-#define CMD_RESEND_PACKET       0x000000FF
+#define CMD_RESEND_PACKET		0x000000FF
 
 #define	V6M_AIRCR_VECTKEY_DATA	0x05FA0000UL
-#define V6M_AIRCR_SYSRESETREQ	0x00000004UL
+#define V6M_AIRCR_SYSRESETREQ		0x00000004UL
 
 #define DISCONNECTED	0
 #define CONNECTING		1
 #define CONNECTED		2
 
 // BLE
-#define BLE_EN                  PC4
-#define BLE_STATUS              PC5
-#define BLE_WAKEUP              PC6
+#define BLE_EN                  	PC4
+#define BLE_STATUS         	PC5
+#define BLE_WAKEUP       	PC6
 // LED
-#define SYNC_LED                PC1
+#define SYNC_LED			PC1
 
-#define APO_PIN	PC14
-#define TSL_PIN	PA5
-#define FCS_PIN	PA6
+#define APO_PIN			PC14
+#define TSL_PIN			PA5
+#define FCS_PIN			PA6
+
+#define POW_KEY			PA3
+#define BLE_LED			PD9
 
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
@@ -71,6 +74,11 @@ uint32_t g_apromSize, g_dataFlashAddr, g_dataFlashSize;
 volatile uint32_t g_pdid, g_timecnt;
 volatile uint16_t timer0_cnt = 0, timer0_start = 0, timer0_cnt1 = 0;
 volatile uint8_t  start_chk = 0;
+
+__IO uint8_t ble_ota_status;	//0:init IO,
+						//1:send ble command 'M'
+						//2:wait command 'M' ack
+						//3:wait meter tyep check 
 
 #ifdef SUPPORT_WRITECKSUM
 static uint32_t g_ckbase = (0x20000 - 8);
@@ -96,9 +104,16 @@ volatile uint16_t led_mode = 0;
 
 volatile uint32_t fmc_data;
 
+__IO uint8_t ble_ota_step = 0;
+__IO uint8_t ble_ota_cmd_retry_cnt;
+
 uint32_t check_aprom_checksum(void);
 void  bin_to_approm (void);
 void default_flash_rom(void);
+void SYS_Init (void);
+void ble_ota_io_init(void);
+void ble_mode_cmd_m(void);
+void ble_ota_step_function (void);
 
 /* ±qFlashÅª¥X§Ç¸¹, 20170407 */
 int FMC_Read1(unsigned int address)
@@ -237,7 +252,7 @@ static int ParseCmd(unsigned char *buffer, uint8_t len, BOOL bUSB)
 	       LastDataLen, g_packno = 1;
 	uint8_t *response;
 	uint16_t cksum, lcksum;
-	uint32_t	lcmd, packno, srclen, i, regcnf0, security;
+	uint32_t	lcmd, srclen, i, regcnf0, security;
 	unsigned char *pSrc;
 	static uint32_t	gcmd;
 
@@ -247,7 +262,7 @@ static int ParseCmd(unsigned char *buffer, uint8_t len, BOOL bUSB)
 	srclen = len;
 
 	lcmd = inpw(pSrc);
-	packno = inpw(pSrc + 4);
+	inpw(pSrc + 4);
 	outpw(response + 4, 0);
 
 	pSrc += 8;
@@ -463,180 +478,42 @@ void CLK_SysTickDelay(uint32_t us)
 	/* Waiting for down-count to zero */
 	while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0);
 }
-__IO uint32_t view;
+__IO uint32_t view,test_key = 1;
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
-	int32_t i32TimeOutCnt;
-	uint32_t	lcmd;
 	uint8_t   i;
-#ifdef SUPPORT_WRITECKSUM
-	uint32_t totallen, cksum;
-#endif
 
-	UNLOCKREG();
-
-	CLK->PWRCTL  |= (CLK_PWRCTL_HIRC_EN | CLK_PWRCTL_LIRC_EN) ;
-	CLK->PWRCTL  &=  ~(CLK_PWRCTL_LXT_EN | CLK_PWRCTL_HXT_EN) ;
-	/* Waiting for 12M/HIRC:12M Xtal stalble */
-	i32TimeOutCnt = __HSI / 200;
-	while ((CLK->CLKSTATUS & CLK_CLKSTATUS_HIRC_STB_Msk) !=
-	       CLK_CLKSTATUS_HIRC_STB_Msk) {
-		if (i32TimeOutCnt-- <= 0)
-			__NOP();
-	}
-	i32TimeOutCnt = __HSI / 200;
-	while ((CLK->CLKSTATUS & CLK_CLKSTATUS_LIRC_STB_Msk) !=
-	       CLK_CLKSTATUS_LIRC_STB_Msk) {
-		if (i32TimeOutCnt-- <= 0)
-			__NOP();
-	}
-	/* reseaved bit defined in main : enable 10kHz */
-	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
-	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN;
-
-    #if defined(JL4PR)
-	PA->DOUT = 0x00000000;
-	SYS->PA_H_MFP =	0x00000000;
-	SYS->PA_L_MFP =	0x00001200;
-	PA->PMD = 0x00000005;
-	PA->OFFD = 0x00070000;
-	PA->PUEN = 0x00000000;
-	PA->DBEN = 0x00000008;
-	
-	PC->DOUT = 0x00004000;//0x00000050;
-	SYS->PC_H_MFP = 0x00000000;//0x00000007;
-	SYS->PC_L_MFP = 0x00000000;//0x70000000;
-	PC->PMD  = 0x10015100;//0x10015100;//0x10001500;0x15511151
-	PC->OFFD = 0x00000000;
-	PC->PUEN = 0x00000200;	
-	
-    #elif defined(JL4RH)
-	PA->DOUT = 0x00000000;
-	SYS->PA_H_MFP = 0x00000000;
-	SYS->PA_L_MFP = 0x00001200;
-	PA->PMD =  0x00000005;
-	PA->OFFD = 0x00070000;
-	PA->PUEN = 0x00000000;
-	PA->DBEN = 0x00000008;
-	
-	PC->DOUT = 0x00004000;//0x00000050;
-	SYS->PC_H_MFP = 0x00000000;//0x00000007;
-	SYS->PC_L_MFP = 0x00000000;//0x70000000;
-	PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
-	PC->OFFD = 0x00000000;
-	PC->PUEN = 0x00000000;
-		
-    #elif defined(JL4PC)
-	PA->DOUT = 0x00000000;
-	SYS->PA_H_MFP =	0x00000000;
-	SYS->PA_L_MFP =	0x00001222;
-	PA->PMD = 0x00000005;
-	PA->OFFD = 0x00070000;
-	PA->PUEN = 0x00000000;
-	PA->DBEN = 0x00000008;
-	
-	PC->DOUT = 0x00004000;//0x00000050;
-	SYS->PC_H_MFP = 0x00000000;//0x00000007;
-	SYS->PC_L_MFP = 0x00000003;//0x70000003;
-	PC->PMD  = 0x10015501;//0x10001501;
-	PC->OFFD = 0x00000000;
-	PC->PUEN = 0x00000000;
-		
-    #else
-	__NOP();
-	__NOP();
-    #endif
-	
-	PB->OFFD = 0x00000000;
-	PB->PUEN = 0x00000000;
-
-	PD->DOUT = 0x00000000;
-	PD->PMD =  0x04140000;
-	SYS->PD_H_MFP =	0x00000000;
-	SYS->PD_L_MFP = 0x00000000;
-	PD->PUEN = 0x00000000;
-	PD->OFFD = 0x00000000;
-
-	SYS->PF_L_MFP = 0x00FF0020;
-	PF->PMD   = 0XFFFFF055;
-	PF->OFFD = 0x00000000;
-	PF->PUEN = 0x00000000;
-	PF->DOUT = 0x00000000;
-
-	/* Lock protected registers */
-	/* Give a dummy target frequency here. */
-	/* Will over write capture resolution with macro */
-	TIMER0->PRECNT = 0x00000000;
-	TIMER0->CMPR   = 12000000 - 1; /* go into interrupt, BASE_TIME counts */
-	TIMER0->CTL    = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
-	/* Enable timer interrupt */
-	TIMER0->IER   |= TIMER_IER_TMR_IE_Msk;
-	NVIC_SetPriority(TMR0_IRQn, 2);
-	NVIC_EnableIRQ(TMR0_IRQn);
-
-	TIMER1->PRECNT = 0x00000000;
-	TIMER1->CMPR   = 2000000  ;
-	TIMER1->CTL = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
-	TIMER1->IER |= TIMER_IER_TMR_IE_Msk;
-	NVIC_SetPriority(TMR1_IRQn, 2);
-	NVIC_EnableIRQ(TMR1_IRQn);
-
-	//while (1);
-	
-	/* Enable VCC power */
-	FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
-
-	g_apromSize = GetApromSize();
-	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
-
-	g_pdid = SYS->PDID;
-#ifdef UART0_TEST
-	g_pUART = UART0;
-	g_UARTIRQ = UART0_IRQn;
-#else
-	g_pUART = UART1;
-	g_UARTIRQ = UART1_IRQn;
-#endif
-	UartInit();
-
-#if defined(USING_AUTODETECT)
-	//timeout 30ms
-	SysTick->LOAD = 30000 * 48; // using 48MHz cpu clock
-	SysTick->VAL  = 0x00;
-	SysTick->CTRL = SysTick->CTRL | (1 << SysTick_CTRL_CLKSOURCE_Pos) |
-			(1 << SysTick_CTRL_ENABLE_Pos);
-
-
-    APO_PIN = 0;
-    TSL_PIN = 0;
-    FCS_PIN = 0;   
- 
-    /* Setup SPI1 multi-function pins */
-    SYS->PA_H_MFP = 0x66660000;    
-    /* Configure as a slave, clock idle low, 32-bit transaction, drive output on falling clock edge and latch input on rising edge. */
-    /* Configure SPI1 as a low level active device. */
-    /* Default setting: slave selection signal is low level active. */    
-    SPI1->SSR = 0x00000005;
-    /* Default setting: MSB first, disable unit transfer interrupt, SP_CYCLE = 0. */    
-    SPI1->CTL = 0x00200044;
-    /* Set DIVIDER = 0 */
-    SPI1->CLKDIV = 0U;    
-    SPI1->FFCTL = 0x44000000;
-    
+	SYS_Init();
  
 
-    // Flash Test
-    //view = SpiFlash_ReadMidDid();
-    //view = check_aprom_checksum();
-    //default_flash_rom();
-    bin_to_approm();
+	// Flash Test
+	//view = SpiFlash_ReadMidDid();
+	view = check_aprom_checksum();
+	//default_flash_rom();
+	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
+	//SpiFlash_NormalPageProgram(0,0x11223344);	    
+	//view = SpiFlash_NormalRead(0);
+	//bin_to_approm();
+	
 
-    //spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
-   // SpiFlash_NormalPageProgram(0,0x11223344);	    
-    //view = SpiFlash_NormalRead(0);
+	if((POW_KEY) && (test_key == 1)) {
 
+		while (1) {
+			ble_ota_step_function();
+			if (ble_ota_step == 4)
+				goto _ISP;
+		}
+	} else {
+		
+		goto _APROM;
+	
+	}
+	
+
+	
+/*
 	while (1) {
 
 			if ((PA->PIN & 0x00000008) && (start_chk == 0)) {
@@ -828,8 +705,8 @@ int32_t main()
 
 		}
 	}
-#endif
-
+//#endif
+*/
 
 #ifdef SUPPORT_WRITECKSUM
 	CheckCksumBase();
@@ -955,6 +832,8 @@ void TMR0_IRQHandler(void)
 		if (timer0_start == 1)
 			timer0_cnt1++;
 	}
+	
+	ble_ota_cmd_retry_cnt++;
 }
 
 void TMR1_IRQHandler(void)
@@ -1020,4 +899,375 @@ void default_flash_rom(void)
 	for (i = 0; i < 32768; i++)
 		SpiFlash_NormalPageProgram(i,i);
 	
+}
+void SYS_Init (void)
+{
+	int32_t i32TimeOutCnt;
+	
+	/* Init System, peripheral clock and multi-function I/O */
+
+#ifdef SUPPORT_WRITECKSUM
+	uint32_t totallen, cksum;
+#endif
+
+	UNLOCKREG();
+
+	CLK->PWRCTL  |= (CLK_PWRCTL_HIRC_EN | CLK_PWRCTL_LIRC_EN) ;
+	CLK->PWRCTL  &=  ~(CLK_PWRCTL_LXT_EN | CLK_PWRCTL_HXT_EN) ;
+	/* Waiting for 12M/HIRC:12M Xtal stalble */
+	i32TimeOutCnt = __HSI / 200;
+	while ((CLK->CLKSTATUS & CLK_CLKSTATUS_HIRC_STB_Msk) !=
+	       CLK_CLKSTATUS_HIRC_STB_Msk) {
+		if (i32TimeOutCnt-- <= 0)
+			__NOP();
+	}
+	i32TimeOutCnt = __HSI / 200;
+	while ((CLK->CLKSTATUS & CLK_CLKSTATUS_LIRC_STB_Msk) !=
+	       CLK_CLKSTATUS_LIRC_STB_Msk) {
+		if (i32TimeOutCnt-- <= 0)
+			__NOP();
+	}
+	/* reseaved bit defined in main : enable 10kHz */
+	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
+	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN;
+
+    #if defined(JL4PR)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP =	0x00000000;
+	SYS->PA_L_MFP =	0x00001200;
+	PA->PMD = 0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000000;//0x70000000;
+	PC->PMD  = 0x10015100;//0x10015100;//0x10001500;0x15511151
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000200;	
+	
+    #elif defined(JL4RH)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP = 0x00000000;
+	SYS->PA_L_MFP = 0x00001200;
+	PA->PMD =  0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000000;//0x70000000;
+	PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000000;
+		
+    #elif defined(JL4PC)
+	PA->DOUT = 0x00000000;
+	SYS->PA_H_MFP =	0x00000000;
+	SYS->PA_L_MFP =	0x00001222;
+	PA->PMD = 0x00000005;
+	PA->OFFD = 0x00070000;
+	PA->PUEN = 0x00000000;
+	PA->DBEN = 0x00000008;
+	
+	PC->DOUT = 0x00004000;//0x00000050;
+	SYS->PC_H_MFP = 0x00000000;//0x00000007;
+	SYS->PC_L_MFP = 0x00000003;//0x70000003;
+	PC->PMD  = 0x10015501;//0x10001501;
+	PC->OFFD = 0x00000000;
+	PC->PUEN = 0x00000000;
+		
+    #else
+	__NOP();
+	__NOP();
+    #endif
+	
+	PB->OFFD = 0x00000000;
+	PB->PUEN = 0x00000000;
+
+	PD->DOUT = 0x00000000;
+	PD->PMD =  0x04140000;
+	SYS->PD_H_MFP =	0x00000000;
+	SYS->PD_L_MFP = 0x00000000;
+	PD->PUEN = 0x00000000;
+	PD->OFFD = 0x00000000;
+
+	SYS->PF_L_MFP = 0x00FF0020;
+	PF->PMD   = 0XFFFFF055;
+	PF->OFFD = 0x00000000;
+	PF->PUEN = 0x00000000;
+	PF->DOUT = 0x00000000;
+
+	/* Lock protected registers */
+	/* Give a dummy target frequency here. */
+	/* Will over write capture resolution with macro */
+	TIMER0->PRECNT = 0x00000000;
+	TIMER0->CMPR   = 12000000 - 1; /* go into interrupt, BASE_TIME counts */
+	TIMER0->CTL    = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
+	/* Enable timer interrupt */
+	TIMER0->IER   |= TIMER_IER_TMR_IE_Msk;
+	NVIC_SetPriority(TMR0_IRQn, 2);
+	NVIC_EnableIRQ(TMR0_IRQn);
+
+	TIMER1->PRECNT = 0x00000000;
+	TIMER1->CMPR   = 2000000  ;
+	TIMER1->CTL = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
+	TIMER1->IER |= TIMER_IER_TMR_IE_Msk;
+	NVIC_SetPriority(TMR1_IRQn, 2);
+	NVIC_EnableIRQ(TMR1_IRQn);
+
+	//while (1);
+	
+	/* Enable VCC power */
+	FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
+
+	g_apromSize = GetApromSize();
+	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
+
+	g_pdid = SYS->PDID;
+#ifdef UART0_TEST
+	g_pUART = UART0;
+	g_UARTIRQ = UART0_IRQn;
+#else
+	g_pUART = UART1;
+	g_UARTIRQ = UART1_IRQn;
+#endif
+	UartInit();
+
+//#if defined(USING_AUTODETECT)
+	//timeout 30ms
+	SysTick->LOAD = 30000 * 48; // using 48MHz cpu clock
+	SysTick->VAL  = 0x00;
+	SysTick->CTRL = SysTick->CTRL | (1 << SysTick_CTRL_CLKSOURCE_Pos) |
+			(1 << SysTick_CTRL_ENABLE_Pos);
+
+
+    APO_PIN = 0;
+    TSL_PIN = 0;
+    FCS_PIN = 0;   
+ 
+    /* Setup SPI1 multi-function pins */
+    SYS->PA_H_MFP = 0x66660000;    
+    /* Configure as a slave, clock idle low, 32-bit transaction, drive output on falling clock edge and latch input on rising edge. */
+    /* Configure SPI1 as a low level active device. */
+    /* Default setting: slave selection signal is low level active. */    
+    SPI1->SSR = 0x00000005;
+    /* Default setting: MSB first, disable unit transfer interrupt, SP_CYCLE = 0. */    
+    SPI1->CTL = 0x00200044;
+    /* Set DIVIDER = 0 */
+    SPI1->CLKDIV = 0U;    
+    SPI1->FFCTL = 0x44000000;	
+
+}
+
+void ble_ota_io_init(void)
+{
+	#if defined(JL4PR)
+		
+		PC->DOUT = 0x00000010;
+		PC->PMD  = 0x10001100;
+		CLK_SysTickDelay(500000); // 5 us
+
+		SYS->PC_H_MFP = 0x00000007;
+		SYS->PC_L_MFP = 0x70000000;
+		PC->DOUT |= BIT6;
+		PC->OFFD = 0x00000000;
+		PC->PUEN = 0x00000200;					
+		
+	#elif defined(JL4RH)
+		
+		PC->DOUT = 0x00000050;
+		PC->PMD  = 0x10001100;
+		CLK_SysTickDelay(500000); // 5 us
+
+		SYS->PC_H_MFP = 0x00000007;
+		SYS->PC_L_MFP = 0x70000000;
+		PC->DOUT |= BIT6;
+			
+	#elif defined(JL4PC)
+
+		PC->DOUT = 0x00000050;
+		PC->PMD  = 0x10001101;
+		CLK_SysTickDelay(500000); // 5 us
+		SYS->PC_H_MFP = 0x00000007;
+		SYS->PC_L_MFP = 0x70000003;
+		PC->DOUT |= BIT6;
+		PC->OFFD = 0x00000000;
+		PC->PUEN = 0x00000000;					
+	#else
+	 __NOP();
+	 __NOP();
+	#endif
+	
+	start_chk = 2;
+	timer0_cnt = 0;
+	//PD->DOUT |= BIT9;
+	BLE_LED = 1;
+	
+
+}
+
+void ble_mode_cmd_m(void)
+{
+	uint8_t i;
+	
+	BLE_wakeup();
+	for (i = 0; i < 10; i++)
+		uart_sendbuf[i] = 0;
+
+	FMC_Read1(0x7A00);
+	if (fmc_data == 0xFFFFFFFF) {
+		FMC_Read1(0x79FC);
+
+		uart_sendbuf[3] =
+			(uint8_t)(fmc_data & 0x000000FF);
+		uart_sendbuf[4] =
+			(int8_t)((fmc_data & 0x0000FF00) >> 8);
+		uart_sendbuf[5] =
+			(int8_t)((fmc_data & 0x00FF0000) >> 16);
+		uart_sendbuf[6] =
+			(int8_t)((fmc_data & 0xFF000000) >> 24);
+	} else {
+		for (i = 0; i < 6; i++) {
+			FMC_Read1(0x7A00 + i * 4);
+			uart_sendbuf[3 + i] = (uint8_t)fmc_data;
+		}
+	}
+	uart_sendbuf[0] = '#';
+	uart_sendbuf[1] = 14;
+	uart_sendbuf[2] = 'M';
+	uart_sendbuf[7] = 'A';
+	uart_sendbuf[8] = 'A';
+
+	#if defined(JL4PR)
+		uart_sendbuf[9] = 'B';
+		uart_sendbuf[10] = 'G';
+	#elif defined(JL4RH)
+		uart_sendbuf[9] = 'B';
+		uart_sendbuf[10] = 'H';
+	#elif defined(JL4PC)
+		uart_sendbuf[9] = 'B';
+		uart_sendbuf[10] = 'F'			
+	#else
+	 __NOP();
+	 __NOP();
+	#endif
+
+	for (i = 0; i < uart_sendbuf[1] - 3; i++)
+		uart_sendbuf[uart_sendbuf[1] - 3] +=
+		uart_sendbuf[i];
+
+	uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
+	uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
+	bufhead = 0;
+	PutString(uart_sendbuf[1]);
+	BLE_sleep();		
+
+}
+
+uint8_t wait_cmd_m_ack(void)
+{
+	uint8_t ack;
+	
+	if (bUartDataReady == TRUE && uart_rcvbuf[2] == 'M') {
+		bUartDataReady = FALSE;
+		ack = 1;
+		BLE_WAKEUP = 1;
+	} else {
+		ack = 0;
+	}
+	
+	return ack;
+}
+
+uint8_t wait_meter_tyep_check(void)
+{
+	uint8_t i,ack;
+
+	if (bUartDataReady == TRUE) {
+		bUartDataReady = FALSE;
+		if (uart_rcvbuf[2] == 'E') {
+			for (i = 0; i < 12; i++)
+				uart_sendbuf[i] = 0;
+		}
+		uart_sendbuf[0] = '#';
+		uart_sendbuf[1] = 10;
+		uart_sendbuf[2] = 'E';
+		uart_sendbuf[3] = 'A';
+		uart_sendbuf[4] = 'A';
+		
+		#if defined(JL4PR)
+			uart_sendbuf[5] = 'B';
+			uart_sendbuf[6] = 'G';
+		#elif defined(JL4RH)
+			uart_sendbuf[5] = 'B';
+			uart_sendbuf[6] = 'H';
+		#elif defined(JL4PC)
+			uart_sendbuf[5] = 'B';
+			uart_sendbuf[6] = 'F';
+		#else
+		 __NOP();
+		 __NOP();
+		#endif
+
+		for (i = 0; i < uart_sendbuf[1] - 3; i++)
+			uart_sendbuf[uart_sendbuf[1] - 3] +=
+				uart_sendbuf[i];
+		uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
+		uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
+		PutString(uart_sendbuf[1]);
+
+		ack = 1;
+	} else {
+		ack = 0;
+	}
+	
+	return ack;
+}
+
+void ble_ota_step_function (void)
+{
+	switch(ble_ota_step) {
+	
+		case 0:
+			ble_ota_io_init();
+			ble_ota_step = 1;
+			break;
+		
+		case 1:
+			ble_mode_cmd_m();
+			ble_ota_step = 2;
+			ble_ota_cmd_retry_cnt = 0;
+			break;
+		
+		case 2:
+				
+			if (ble_ota_cmd_retry_cnt > 3) {
+				
+				ble_ota_step = 2;
+
+			} else  {
+		
+				if (wait_cmd_m_ack())
+					ble_ota_step = 3;
+			}
+			
+			break;
+		
+		case 3 :
+			
+			if(wait_meter_tyep_check()) 
+				ble_ota_step = 4;
+		
+			break;
+		
+		case 4 :
+			
+			__NOP();
+			
+			break;
+	}
+
 }
