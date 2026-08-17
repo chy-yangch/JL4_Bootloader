@@ -111,7 +111,7 @@ volatile uint32_t fmc_data;
 __IO uint8_t ble_ota_step = 0;
 __IO uint8_t ble_ota_cmd_retry_cnt;
 
-uint32_t check_aprom_checksum(void);
+uint32_t calculate_aprom_checksum(void);
 void  bin_to_approm (void);
 void default_flash_rom(void);
 void SYS_Init (void);
@@ -490,7 +490,7 @@ int32_t main()
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
 	uint8_t   i;
-	uint32_t flash_checksum,approm_checksum;
+	uint32_t flash_checksum,calculate_approm,get_approm_checksum;
 
 	SYS_Init();
  
@@ -501,10 +501,10 @@ int32_t main()
 	//RTC_SPR(2) = 0x00000055;
 	
 	// Enable Write RTC RAM
-	RTC->CAR = 0x0000A965;
+	//RTC->CAR = 0x0000A965;
 	//Write RTC RAM
 	//RTC->SPR0 = 0x12345678;
-	RTC->SPR1 = 0xABCDEF01;
+	//RTC->SPR1 = 0xABCDEF01;
 	//Read RTC RAM	
 	approm_update = RTC->SPR0;	
 	
@@ -517,15 +517,16 @@ int32_t main()
 	
 	// Flash Test
 	//view = SpiFlash_ReadMidDid();
-	approm_checksum = check_aprom_checksum();
+	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum
+	ReadData( 0x7DFC,  0X7E00, (uint32_t *)get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
-	flash_checksum = SpiFlash_NormalRead(0);
+	//flash_checksum = SpiFlash_NormalRead(0);
 
 
 	
-	if (approm_checksum != flash_checksum)
+	if (calculate_approm != get_approm_checksum)
 		goto _CHECK_ERR;
 	
 	
@@ -671,29 +672,37 @@ void TMR1_IRQHandler(void)
 	}
 }
 
-uint32_t check_aprom_checksum(void)			//約50ms完成
+uint32_t calculate_aprom_checksum(void)			//約50ms完成
 {
 	uint16_t i,j;
 	uint32_t check_sum;
 	uint32_t upd_data[128];
 
 	check_sum = 0;
-
+	
+	//31.5K的APROM最後4 Bytes為checksum不列入計算
 	for (i = 0; i < 64; i++) {
 
 		ReadData( i * 0x200,  i * 0x200 + 0x200, (uint32_t *)upd_data);
 
-		for (j = 0; j < 128;j++)
-			check_sum+= upd_data[j];
-
+		if (i < 63) {
+			
+			for (j = 0; j < 128;j++)
+				check_sum+= upd_data[j];
+		} else {
+		
+			for (j = 0; j < 127;j++)
+				check_sum+= upd_data[j];
+		}
 	}
 
 	return check_sum;
 }
-__IO uint32_t data_upd_data[128];
+
+//__IO uint32_t data_upd_data[128];
 void  bin_to_approm (void)
 {
-	//uint32_t data_upd_data[128];
+	uint32_t data_upd_data[128];
 	uint16_t i,j;
 
 	//更新31.5K,其中0.5K儲存設定值

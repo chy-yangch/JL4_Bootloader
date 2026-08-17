@@ -47,7 +47,6 @@ Section Cross References
     main.o(i.UART1_IRQHandler) refers to main.o(.bss) for .bss
     main.o(i.bin_to_approm) refers to w25q32.o(i.SpiFlash_NormalRead) for SpiFlash_NormalRead
     main.o(i.bin_to_approm) refers to fmc.o(i.WriteData) for WriteData
-    main.o(i.bin_to_approm) refers to main.o(.bss) for .bss
     main.o(i.ble_mode_cmd_m) refers to main.o(i.BLE_wakeup) for BLE_wakeup
     main.o(i.ble_mode_cmd_m) refers to main.o(i.FMC_Read1) for FMC_Read1
     main.o(i.ble_mode_cmd_m) refers to main.o(i.PutString) for PutString
@@ -62,13 +61,13 @@ Section Cross References
     main.o(i.ble_ota_step_function) refers to main.o(i.wait_cmd_m_ack) for wait_cmd_m_ack
     main.o(i.ble_ota_step_function) refers to main.o(i.wait_meter_tyep_check) for wait_meter_tyep_check
     main.o(i.ble_ota_step_function) refers to main.o(.data) for .data
-    main.o(i.check_aprom_checksum) refers to fmc.o(i.ReadData) for ReadData
+    main.o(i.calculate_aprom_checksum) refers to fmc.o(i.ReadData) for ReadData
     main.o(i.default_flash_rom) refers to w25q32.o(i.SpiFlash_ChipErase_logger) for SpiFlash_ChipErase_logger
     main.o(i.default_flash_rom) refers to w25q32.o(i.SpiFlash_NormalPageProgram) for SpiFlash_NormalPageProgram
     main.o(i.main) refers to main.o(i.SYS_Init) for SYS_Init
     main.o(i.main) refers to main.o(i.bin_to_approm) for bin_to_approm
-    main.o(i.main) refers to main.o(i.check_aprom_checksum) for check_aprom_checksum
-    main.o(i.main) refers to w25q32.o(i.SpiFlash_NormalRead) for SpiFlash_NormalRead
+    main.o(i.main) refers to main.o(i.calculate_aprom_checksum) for calculate_aprom_checksum
+    main.o(i.main) refers to fmc.o(i.ReadData) for ReadData
     main.o(i.main) refers to main.o(i.ble_ota_step_function) for ble_ota_step_function
     main.o(i.main) refers to main.o(i.ParseCmd) for ParseCmd
     main.o(i.main) refers to fmc.o(i.FMC_Write) for FMC_Write
@@ -235,13 +234,13 @@ Image Symbol Table
     i.__scatterload_null                     0x00000aac   Section        2  handlers.o(i.__scatterload_null)
     i.__scatterload_zeroinit                 0x00000aae   Section       14  handlers.o(i.__scatterload_zeroinit)
     i.bin_to_approm                          0x00000abc   Section        0  main.o(i.bin_to_approm)
-    i.ble_mode_cmd_m                         0x00000af4   Section        0  main.o(i.ble_mode_cmd_m)
-    i.ble_ota_io_init                        0x00000bb4   Section        0  main.o(i.ble_ota_io_init)
-    i.ble_ota_step_function                  0x00000c04   Section        0  main.o(i.ble_ota_step_function)
-    i.check_aprom_checksum                   0x00000c5c   Section        0  main.o(i.check_aprom_checksum)
-    i.main                                   0x00000c98   Section        0  main.o(i.main)
-    i.wait_cmd_m_ack                         0x00000e54   Section        0  main.o(i.wait_cmd_m_ack)
-    i.wait_meter_tyep_check                  0x00000e80   Section        0  main.o(i.wait_meter_tyep_check)
+    i.ble_mode_cmd_m                         0x00000af8   Section        0  main.o(i.ble_mode_cmd_m)
+    i.ble_ota_io_init                        0x00000bb8   Section        0  main.o(i.ble_ota_io_init)
+    i.ble_ota_step_function                  0x00000c08   Section        0  main.o(i.ble_ota_step_function)
+    i.calculate_aprom_checksum               0x00000c60   Section        0  main.o(i.calculate_aprom_checksum)
+    i.main                                   0x00000cb0   Section        0  main.o(i.main)
+    i.wait_cmd_m_ack                         0x00000e68   Section        0  main.o(i.wait_cmd_m_ack)
+    i.wait_meter_tyep_check                  0x00000e94   Section        0  main.o(i.wait_meter_tyep_check)
     .data                                    0x20000000   Section        8  system_nano1x2series.o(.data)
     .data                                    0x20000008   Section       88  main.o(.data)
     g_UARTIRQ                                0x20000009   Data           1  main.o(.data)
@@ -254,11 +253,11 @@ Image Symbol Table
     LastDataLen                              0x20000030   Data           4  main.o(.data)
     g_packno                                 0x20000034   Data           4  main.o(.data)
     gcmd                                     0x20000038   Data           4  main.o(.data)
-    .bss                                     0x20000060   Section     1152  main.o(.bss)
+    .bss                                     0x20000060   Section      640  main.o(.bss)
     uart_rcvbuf                              0x20000060   Data          64  main.o(.bss)
     uart_sendbuf                             0x200000a0   Data          64  main.o(.bss)
     aprom_buf                                0x200000e0   Data         512  main.o(.bss)
-    STACK                                    0x200004e0   Section     1280  startup_nano1x2series.o(STACK)
+    STACK                                    0x200002e0   Section     1280  startup_nano1x2series.o(STACK)
 
     Global Symbols
 
@@ -336,16 +335,16 @@ Image Symbol Table
     __scatterload_copy                       0x00000a9f   Thumb Code    14  handlers.o(i.__scatterload_copy)
     __scatterload_null                       0x00000aad   Thumb Code     2  handlers.o(i.__scatterload_null)
     __scatterload_zeroinit                   0x00000aaf   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    bin_to_approm                            0x00000abd   Thumb Code    52  main.o(i.bin_to_approm)
-    ble_mode_cmd_m                           0x00000af5   Thumb Code   178  main.o(i.ble_mode_cmd_m)
-    ble_ota_io_init                          0x00000bb5   Thumb Code    54  main.o(i.ble_ota_io_init)
-    ble_ota_step_function                    0x00000c05   Thumb Code    82  main.o(i.ble_ota_step_function)
-    check_aprom_checksum                     0x00000c5d   Thumb Code    58  main.o(i.check_aprom_checksum)
-    main                                     0x00000c99   Thumb Code   400  main.o(i.main)
-    wait_cmd_m_ack                           0x00000e55   Thumb Code    32  main.o(i.wait_cmd_m_ack)
-    wait_meter_tyep_check                    0x00000e81   Thumb Code   120  main.o(i.wait_meter_tyep_check)
-    Region$$Table$$Base                      0x00000f00   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x00000f20   Number         0  anon$$obj.o(Region$$Table)
+    bin_to_approm                            0x00000abd   Thumb Code    60  main.o(i.bin_to_approm)
+    ble_mode_cmd_m                           0x00000af9   Thumb Code   178  main.o(i.ble_mode_cmd_m)
+    ble_ota_io_init                          0x00000bb9   Thumb Code    54  main.o(i.ble_ota_io_init)
+    ble_ota_step_function                    0x00000c09   Thumb Code    82  main.o(i.ble_ota_step_function)
+    calculate_aprom_checksum                 0x00000c61   Thumb Code    80  main.o(i.calculate_aprom_checksum)
+    main                                     0x00000cb1   Thumb Code   398  main.o(i.main)
+    wait_cmd_m_ack                           0x00000e69   Thumb Code    32  main.o(i.wait_cmd_m_ack)
+    wait_meter_tyep_check                    0x00000e95   Thumb Code   120  main.o(i.wait_meter_tyep_check)
+    Region$$Table$$Base                      0x00000f14   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x00000f34   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000000   Data           4  system_nano1x2series.o(.data)
     CyclesPerUs                              0x20000004   Data           4  system_nano1x2series.o(.data)
     start_chk                                0x20000008   Data           1  main.o(.data)
@@ -367,8 +366,7 @@ Image Symbol Table
     g_timecnt                                0x20000054   Data           4  main.o(.data)
     lcmd_reg                                 0x20000058   Data           4  main.o(.data)
     fmc_data                                 0x2000005c   Data           4  main.o(.data)
-    data_upd_data                            0x200002e0   Data         512  main.o(.bss)
-    __initial_sp                             0x200009e0   Data           0  startup_nano1x2series.o(STACK)
+    __initial_sp                             0x200007e0   Data           0  startup_nano1x2series.o(STACK)
 
 
 
@@ -378,9 +376,9 @@ Memory Map of the image
 
   Image Entry point : 0x000000d5
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000f80, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000f94, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000f20, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000f34, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -424,32 +422,31 @@ Memory Map of the image
     0x00000a9e   0x00000a9e   0x0000000e   Code   RO          409    i.__scatterload_copy  mc_p.l(handlers.o)
     0x00000aac   0x00000aac   0x00000002   Code   RO          410    i.__scatterload_null  mc_p.l(handlers.o)
     0x00000aae   0x00000aae   0x0000000e   Code   RO          411    i.__scatterload_zeroinit  mc_p.l(handlers.o)
-    0x00000abc   0x00000abc   0x00000038   Code   RO           85    i.bin_to_approm     main.o
-    0x00000af4   0x00000af4   0x000000c0   Code   RO           86    i.ble_mode_cmd_m    main.o
-    0x00000bb4   0x00000bb4   0x00000050   Code   RO           87    i.ble_ota_io_init   main.o
-    0x00000c04   0x00000c04   0x00000058   Code   RO           88    i.ble_ota_step_function  main.o
-    0x00000c5c   0x00000c5c   0x0000003a   Code   RO           89    i.check_aprom_checksum  main.o
-    0x00000c96   0x00000c96   0x00000002   PAD
-    0x00000c98   0x00000c98   0x000001bc   Code   RO           91    i.main              main.o
-    0x00000e54   0x00000e54   0x0000002c   Code   RO           92    i.wait_cmd_m_ack    main.o
-    0x00000e80   0x00000e80   0x00000080   Code   RO           93    i.wait_meter_tyep_check  main.o
-    0x00000f00   0x00000f00   0x00000020   Data   RO          407    Region$$Table       anon$$obj.o
+    0x00000abc   0x00000abc   0x0000003c   Code   RO           85    i.bin_to_approm     main.o
+    0x00000af8   0x00000af8   0x000000c0   Code   RO           86    i.ble_mode_cmd_m    main.o
+    0x00000bb8   0x00000bb8   0x00000050   Code   RO           87    i.ble_ota_io_init   main.o
+    0x00000c08   0x00000c08   0x00000058   Code   RO           88    i.ble_ota_step_function  main.o
+    0x00000c60   0x00000c60   0x00000050   Code   RO           89    i.calculate_aprom_checksum  main.o
+    0x00000cb0   0x00000cb0   0x000001b8   Code   RO           91    i.main              main.o
+    0x00000e68   0x00000e68   0x0000002c   Code   RO           92    i.wait_cmd_m_ack    main.o
+    0x00000e94   0x00000e94   0x00000080   Code   RO           93    i.wait_meter_tyep_check  main.o
+    0x00000f14   0x00000f14   0x00000020   Data   RO          407    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000f20, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
-
-    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x20000000   0x00000f20   0x00000008   Data   RW            6    .data               system_nano1x2series.o
-    0x20000008   0x00000f28   0x00000058   Data   RW           95    .data               main.o
-
-
-    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000f80, Size: 0x00000980, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000f34, Size: 0x00000060, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000060        -       0x00000480   Zero   RW           94    .bss                main.o
-    0x200004e0        -       0x00000500   Zero   RW           63    STACK               startup_nano1x2series.o
+    0x20000000   0x00000f34   0x00000008   Data   RW            6    .data               system_nano1x2series.o
+    0x20000008   0x00000f3c   0x00000058   Data   RW           95    .data               main.o
+
+
+    Execution Region ER_ZI (Exec base: 0x20000060, Load base: 0x00000f94, Size: 0x00000780, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x20000060        -       0x00000280   Zero   RW           94    .bss                main.o
+    0x200002e0        -       0x00000500   Zero   RW           63    STACK               startup_nano1x2series.o
 
 
 ==============================================================================
@@ -460,15 +457,15 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        384         36          0          0          0       5370   fmc.o
-      2872        356          0         88       1152     110950   main.o
+      2894        350          0         88        640     111108   main.o
         84         34        192          0       1280        756   startup_nano1x2series.o
          0          0          0          8          0       4898   system_nano1x2series.o
        220          4          0          0          0       5477   w25q32.o
 
     ----------------------------------------------------------------------
-      3562        430        224         96       2432     127451   Object Totals
+      3582        424        224         96       1920     127609   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         2          0          0          0          0          0   (incl. Padding)
+         0          0          0          0          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -505,15 +502,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      3648        446        224         96       2432     126439   Grand Totals
-      3648        446        224         96       2432     126439   ELF Image Totals
-      3648        446        224         96          0          0   ROM Totals
+      3668        440        224         96       1920     126597   Grand Totals
+      3668        440        224         96       1920     126597   ELF Image Totals
+      3668        440        224         96          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 3872 (   3.78kB)
-    Total RW  Size (RW Data + ZI Data)              2528 (   2.47kB)
-    Total ROM Size (Code + RO Data + RW Data)       3968 (   3.88kB)
+    Total RO  Size (Code + RO Data)                 3892 (   3.80kB)
+    Total RW  Size (RW Data + ZI Data)              2016 (   1.97kB)
+    Total ROM Size (Code + RO Data + RW Data)       3988 (   3.89kB)
 
 ==============================================================================
 
