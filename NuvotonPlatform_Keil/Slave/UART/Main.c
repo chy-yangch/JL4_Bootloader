@@ -702,14 +702,19 @@ uint32_t calculate_aprom_checksum(void)			//約50ms完成
 //__IO uint32_t data_upd_data[128];
 void  bin_to_approm (void)
 {
-	uint32_t data_upd_data[128];
+	uint32_t data_upd_data[128],addr;
 	uint16_t i,j;
 
 	//更新31.5K,其中0.5K儲存設定值
 	for (i = 0; i < 63; i++) {
 
-		for (j = 0; j < 128; j++)
-			data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
+		for (j = 0; j < 128; j++) {
+			
+			addr = FW_BIN_ADDR + (j * 4) + ( i * 512);
+			data_upd_data[j] = SpiFlash_NormalRead(addr);
+			//data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
+			
+		}
 
 		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
 

@@ -56,7 +56,7 @@ int32_t SpiFlash_NormalRead(uint32_t addr)
 	uint8_t *flash_buf;
 	uint32_t data = 0;
 
-	addr = addr * 4;
+	//addr = addr * 4;
 	flash_buf = (uint8_t *)(&addr);
 
 	/* /CS: active */
