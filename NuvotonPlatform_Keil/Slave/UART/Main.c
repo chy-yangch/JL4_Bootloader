@@ -518,7 +518,7 @@ int32_t main()
 	// Flash Test
 	//view = SpiFlash_ReadMidDid();
 	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum
-	ReadData( 0x7DFC,  0X7E00, (uint32_t *)get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+	ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
