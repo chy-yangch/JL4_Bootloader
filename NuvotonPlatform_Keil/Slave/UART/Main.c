@@ -16,7 +16,7 @@
 //#define JL4PR
 //#define JL4PC
 
-#define FW_BIN_ADDR	0
+#define FW_BIN_ADDR	0x1000
 
 #define USING_AUTODETECT
 
@@ -510,6 +510,7 @@ int32_t main()
 	
 	if (approm_update) {
 
+		EraseAP(FALSE, 0, 0x00007E00);
 		bin_to_approm();
 		RTC->CAR = 0x0000A965;
 		RTC->SPR0 = 0;
