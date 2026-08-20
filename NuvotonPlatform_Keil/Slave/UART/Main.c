@@ -17,6 +17,7 @@
 //#define JL4PC
 
 #define FW_BIN_ADDR	0x1000
+//#define FW_BIN_ADDR	0x0000 //test
 
 #define USING_AUTODETECT
 
@@ -484,16 +485,26 @@ void CLK_SysTickDelay(uint32_t us)
 }
 __IO uint32_t view,test_key = 1;
 __IO uint8_t approm_update = 0;
-
+//__IO uint32_t dd = 0x12345678;
+//__IO uint8_t reg[10] ={0};
+__IO uint32_t aprom_sum;
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
-	uint8_t   i;
+	uint8_t   i,*ptr;
 	uint32_t flash_checksum,calculate_approm,get_approm_checksum;
 
+	
+//	ptr = (uint8_t *)&dd;
+//	
+//	reg[0] = *(ptr + 3);
+//	reg[1] = *(ptr + 2);
+//	reg[2] = *(ptr + 1);
+//	reg[3] = *(ptr + 0);
+	
 	SYS_Init();
- 
+
 	/* Write 80-byte spare RAM */
 	//RTC_RWEN = 0x0000A965;
 	//RTC_SPR(0) = 0x12345678;
@@ -509,8 +520,7 @@ int32_t main()
 	approm_update = RTC->SPR0;	
 	
 	if (approm_update) {
-
-		EraseAP(FALSE, 0, 0x00007E00);
+		
 		bin_to_approm();
 		RTC->CAR = 0x0000A965;
 		RTC->SPR0 = 0;
@@ -520,6 +530,10 @@ int32_t main()
 	//view = SpiFlash_ReadMidDid();
 	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum
 	ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+
+	//由APROM讀出的checksum需再次反轉
+	get_approm_checksum=__REV(get_approm_checksum);
+	
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
@@ -672,28 +686,32 @@ void TMR1_IRQHandler(void)
 		break;
 	}
 }
-
+__IO uint32_t k = 0;
 uint32_t calculate_aprom_checksum(void)			//約50ms完成
 {
 	uint16_t i,j;
 	uint32_t check_sum;
-	uint32_t upd_data[128];
+	uint8_t upd_data[512];
 
 	check_sum = 0;
 	
 	//31.5K的APROM最後4 Bytes為checksum不列入計算
-	for (i = 0; i < 64; i++) {
+	for (i = 0; i < 63; i++) {
 
 		ReadData( i * 0x200,  i * 0x200 + 0x200, (uint32_t *)upd_data);
 
-		if (i < 63) {
+		if (i < 62) {
 			
-			for (j = 0; j < 128;j++)
+			for (j = 0; j < 512;j++) {
 				check_sum+= upd_data[j];
+				k++;
+			}
 		} else {
-		
-			for (j = 0; j < 127;j++)
+			//最後4Bytes為checksum不進行加總運算
+			for (j = 0; j < 508;j++) {
 				check_sum+= upd_data[j];
+				k++;
+			}
 		}
 	}
 
@@ -703,23 +721,54 @@ uint32_t calculate_aprom_checksum(void)			//約50ms完成
 //__IO uint32_t data_upd_data[128];
 void  bin_to_approm (void)
 {
-	uint32_t data_upd_data[128],addr;
-	uint16_t i,j;
+	
+	uint32_t data_upd_data[128],addr,u32_data,i,j;
+	//uint16_t i,j;
 
+	EraseAP(FALSE, 0, 0x00007E00);	
+	
 	//更新31.5K,其中0.5K儲存設定值
 	for (i = 0; i < 63; i++) {
 
 		for (j = 0; j < 128; j++) {
 			
 			addr = FW_BIN_ADDR + (j * 4) + ( i * 512);
-			data_upd_data[j] = SpiFlash_NormalRead(addr);
+			
+			u32_data = SpiFlash_NormalRead(addr);
+			
+			//__REV() 就是 32-bit Byte Reverse,因寫入MCU的函數是由小排到大,所以需經過反轉
+			data_upd_data[j] = __REV(u32_data);
 			//data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
 			
 		}
 
 		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
+		
+		if (i >= 56) {
+			
+			__NOP();
+			__NOP();
+		}
 
 	}
+	
+//	uint32_t data_upd_data[128],addr;
+//	uint16_t i,j;
+
+//	//更新31.5K,其中0.5K儲存設定值
+//	for (i = 0; i < 63; i++) {
+
+//		for (j = 0; j < 128; j++) {
+//			
+//			addr = FW_BIN_ADDR + (j * 4) + ( i * 512);
+//			data_upd_data[j] = SpiFlash_NormalRead(addr);
+//			//data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
+//			
+//		}
+
+//		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
+
+//	}
 
 }
 /*
