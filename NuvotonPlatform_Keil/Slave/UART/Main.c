@@ -121,24 +121,28 @@ void ble_mode_cmd_m(void);
 void ble_ota_step_function (void);
 
 /* 從Flash讀出序號, 20170407 */
+
 int FMC_Read1(unsigned int address)
 {
 	unsigned int Reg;
 
-//	outp32(ISPCMD, ISP_Read);
-//	outp32(ISPADR, address);
-//	outp32(ISPDAT, 0x00000000);
-//	outp32(ISPTRG, ISPGO);
+	
+	/* FMC 如果內容空白有時直接更新OTA,其內容皆為0xFFFF*/
+	
+	outp32(ISPCMD, ISP_Read);
+	outp32(ISPADR, address);
+	outp32(ISPDAT, 0x00000000);
+	outp32(ISPTRG, ISPGO);
 
-//	__ISB();
+	__ISB();
 
-//	Reg = inp32(FISPCON);
-//	if (Reg & ISPFF) {
-//		outp32(FISPCON, Reg);
-//		return -1;
-//	}
+	Reg = inp32(FISPCON);
+	if (Reg & ISPFF) {
+		outp32(FISPCON, Reg);
+		return -1;
+	}
 
-//	fmc_data  = inp32(ISPDAT);
+	fmc_data  = inp32(ISPDAT);
 
 	return 0;
 }
@@ -539,9 +543,10 @@ int32_t main()
 		bin_to_approm();
 		
 		spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
+		calculate_approm = get_approm_checksum = 0;
 		//RTC->CAR = 0x0000A965;
 		//RTC->SPR0 = 0;
-	}
+	} else {
 	
 	
 	
@@ -554,7 +559,7 @@ int32_t main()
 	ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
 	//由APROM讀出的checksum需再次反轉
 	get_approm_checksum=__REV(get_approm_checksum);
-	
+	}
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
@@ -715,7 +720,7 @@ void TMR1_IRQHandler(void)
 		break;
 	}
 }
-__IO uint32_t k = 0;
+//__IO uint32_t k = 0;
 uint32_t calculate_aprom_checksum(void)			//約50ms完成
 {
 	uint16_t i,j;
@@ -733,13 +738,13 @@ uint32_t calculate_aprom_checksum(void)			//約50ms完成
 			
 			for (j = 0; j < 512;j++) {
 				check_sum+= upd_data[j];
-				k++;
+				//k++;
 			}
 		} else {
 			//最後4Bytes為checksum不進行加總運算
 			for (j = 0; j < 508;j++) {
 				check_sum+= upd_data[j];
-				k++;
+				//k++;
 			}
 		}
 	}
@@ -861,20 +866,20 @@ void SYS_Init (void)
 	PC->PUEN = 0x00000200;	
 	
     #elif defined(JL4RH)
-	PA->DOUT = 0x00000000;
-	SYS->PA_H_MFP = 0x00000000;
+	//PA->DOUT = 0x00000000;
+	//SYS->PA_H_MFP = 0x00000000;
 	SYS->PA_L_MFP = 0x00001200;
 	PA->PMD =  0x00000005;
 	PA->OFFD = 0x00070000;
-	PA->PUEN = 0x00000000;
+	//PA->PUEN = 0x00000000;
 	PA->DBEN = 0x00000008;
 	
 	PC->DOUT = 0x00004000;//0x00000050;
 	SYS->PC_H_MFP = 0x00000000;//0x00000007;
-	SYS->PC_L_MFP = 0x00000000;//0x70000000;
+	//SYS->PC_L_MFP = 0x00000000;//0x70000000;
 	PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
-	PC->OFFD = 0x00000000;
-	PC->PUEN = 0x00000000;
+	//PC->OFFD = 0x00000000;
+	//PC->PUEN = 0x00000000;
 		
     #elif defined(JL4PC)
 	PA->DOUT = 0x00000000;
@@ -897,23 +902,23 @@ void SYS_Init (void)
 	__NOP();
     #endif
 	
-	PB->OFFD = 0x00000000;
-	PB->PUEN = 0x00000000;
+	//PB->OFFD = 0x00000000;
+	//PB->PUEN = 0x00000000;
 	
 	PB->PMD |= 0x01000000;
 
-	PD->DOUT = 0x00000000;
+	//PD->DOUT = 0x00000000;
 	PD->PMD =  0x04140000;
-	SYS->PD_H_MFP =	0x00000000;
-	SYS->PD_L_MFP = 0x00000000;
-	PD->PUEN = 0x00000000;
-	PD->OFFD = 0x00000000;
+	//SYS->PD_H_MFP =	0x00000000;
+	//SYS->PD_L_MFP = 0x00000000;
+	//PD->PUEN = 0x00000000;
+	//PD->OFFD = 0x00000000;
 
 	SYS->PF_L_MFP = 0x00FF0020;
 	PF->PMD   = 0XFFFFF055;
-	PF->OFFD = 0x00000000;
-	PF->PUEN = 0x00000000;
-	PF->DOUT = 0x00000000;
+	//PF->OFFD = 0x00000000;
+	//PF->PUEN = 0x00000000;
+	//PF->DOUT = 0x00000000;
 
 	/* Lock protected registers */
 	/* Give a dummy target frequency here. */

@@ -142,9 +142,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>531</LineNumber>
+          <LineNumber>573</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>3318</Address>
+          <Address>3426</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -153,14 +153,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\531</Expression>
+          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\573</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>535</LineNumber>
+          <LineNumber>557</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>3328</Address>
+          <Address>3392</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -169,14 +169,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\535</Expression>
+          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\557</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>541</LineNumber>
+          <LineNumber>539</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>3354</Address>
+          <Address>3352</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -185,14 +185,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\541</Expression>
+          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\539</Expression>
         </Bp>
         <Bp>
           <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>568</LineNumber>
+          <LineNumber>545</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>3396</Address>
+          <Address>3378</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -201,23 +201,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\568</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>537</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>3340</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\537</Expression>
+          <Expression>\\ISPCode_Nano112_UARTOnly\Main.c\545</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
