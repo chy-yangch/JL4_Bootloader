@@ -488,12 +488,15 @@ __IO uint8_t approm_update = 0;
 //__IO uint32_t dd = 0x12345678;
 //__IO uint8_t reg[10] ={0};
 __IO uint32_t aprom_sum;
+
+__IO uint32_t flash_checksum,calculate_approm,get_approm_checksum;
+
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
 	uint8_t   i,*ptr;
-	uint32_t flash_checksum,calculate_approm,get_approm_checksum;
+	//uint32_t flash_checksum,calculate_approm,get_approm_checksum;
 
 	
 //	ptr = (uint8_t *)&dd;
@@ -517,20 +520,33 @@ int32_t main()
 	//RTC->SPR0 = 0x12345678;
 	//RTC->SPR1 = 0xABCDEF01;
 	//Read RTC RAM	
-	approm_update = RTC->SPR0;	
+	//approm_update = RTC->SPR0;
+
+	PD->DOUT |= BIT10;
+	
+	//ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+	
+	if (get_approm_checksum == 0xFFFFFFFF)
+		approm_update = 1;
 	
 	if (approm_update) {
+		PD->DOUT |= BIT10;
+		PD->DOUT |= BIT13;
 		
 		bin_to_approm();
-		RTC->CAR = 0x0000A965;
-		RTC->SPR0 = 0;
+		//RTC->CAR = 0x0000A965;
+		//RTC->SPR0 = 0;
 	}
+	
+	
+	
+	//PD->DOUT &= ~BIT10;
 	
 	// Flash Test
 	//view = SpiFlash_ReadMidDid();
-	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum
+	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum,***在這之前作ReadData動作會造成APROM數值異動,原因不明
+	get_approm_checksum = 0;
 	ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
-
 	//由APROM讀出的checksum需再次反轉
 	get_approm_checksum=__REV(get_approm_checksum);
 	
@@ -539,10 +555,18 @@ int32_t main()
 	//SpiFlash_NormalPageProgram(0,0x11223344);	    
 	//flash_checksum = SpiFlash_NormalRead(0);
 
+	//while(1);
 
+	SysTimerDelay(5000000);
+//	goto _APROM;
 	
-	if (calculate_approm != get_approm_checksum)
+	if (calculate_approm != get_approm_checksum) {
+		
+		__NOP();
+//		__NOP();		
+		
 		goto _CHECK_ERR;
+	}
 	
 	
 	if((POW_KEY) && (test_key == 1)) {
@@ -623,14 +647,14 @@ _ISP:
 			}
 		}
 
-		if (PA->PIN & 0x00000008) {
-			timer0_start = 1;
-			if (timer0_cnt1 >= 5)
-				goto _RST;
-		} else {
-			timer0_start = 0;
-			timer0_cnt1 = 0;
-		}
+//		if (PA->PIN & 0x00000008) {
+//			timer0_start = 1;
+//			if (timer0_cnt1 >= 5)
+//				goto _RST;
+//		} else {
+//			timer0_start = 0;
+//			timer0_cnt1 = 0;
+//		}
 		
 		if (lcmd_reg == CMD_RUN_APROM) {
 			if (led_tt >= 30) {

@@ -13,6 +13,7 @@ extern uint16_t SpiFlash_ReadMidDid(void);
 extern void SpiFlash_NormalPageProgram(uint32_t addr, uint32_t data) ;
 extern void spi_flash_erase(uint8_t cmd, uint32_t addr);
 extern void SpiFlash_ChipErase_logger(uint8_t sets);
+extern void spi_flash_erase(uint8_t cmd, uint32_t addr);
 
 #endif  /* __UART_TRANS_H__ */
 
