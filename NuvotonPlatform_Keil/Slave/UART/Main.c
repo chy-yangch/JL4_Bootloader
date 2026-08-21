@@ -125,20 +125,20 @@ int FMC_Read1(unsigned int address)
 {
 	unsigned int Reg;
 
-	outp32(ISPCMD, ISP_Read);
-	outp32(ISPADR, address);
-	outp32(ISPDAT, 0x00000000);
-	outp32(ISPTRG, ISPGO);
+//	outp32(ISPCMD, ISP_Read);
+//	outp32(ISPADR, address);
+//	outp32(ISPDAT, 0x00000000);
+//	outp32(ISPTRG, ISPGO);
 
-	__ISB();
+//	__ISB();
 
-	Reg = inp32(FISPCON);
-	if (Reg & ISPFF) {
-		outp32(FISPCON, Reg);
-		return -1;
-	}
+//	Reg = inp32(FISPCON);
+//	if (Reg & ISPFF) {
+//		outp32(FISPCON, Reg);
+//		return -1;
+//	}
 
-	fmc_data  = inp32(ISPDAT);
+//	fmc_data  = inp32(ISPDAT);
 
 	return 0;
 }
@@ -489,7 +489,7 @@ __IO uint8_t approm_update = 0;
 //__IO uint8_t reg[10] ={0};
 __IO uint32_t aprom_sum;
 
-__IO uint32_t flash_checksum,calculate_approm,get_approm_checksum;
+__IO uint32_t flash_checksum,calculate_approm,get_approm_checksum,ota_upate;
 
 int32_t main()
 {
@@ -526,14 +526,19 @@ int32_t main()
 	
 	//ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
 	
-	if (get_approm_checksum == 0xFFFFFFFF)
+	ota_upate = SpiFlash_NormalRead(0);			
+
+	if (ota_upate == 0)
 		approm_update = 1;
+	
 	
 	if (approm_update) {
 		PD->DOUT |= BIT10;
 		PD->DOUT |= BIT13;
 		
 		bin_to_approm();
+		
+		spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 		//RTC->CAR = 0x0000A965;
 		//RTC->SPR0 = 0;
 	}
@@ -656,24 +661,24 @@ _ISP:
 //			timer0_cnt1 = 0;
 //		}
 		
-		if (lcmd_reg == CMD_RUN_APROM) {
-			if (led_tt >= 30) {
-				goto _RST;
-			} else
-				__NOP();
-		}
+//		if (lcmd_reg == CMD_RUN_APROM) {
+//			if (led_tt >= 30) {
+//				goto _RST;
+//			} else
+//				__NOP();
+//		}
 	/* timeout happen; but byte is less than 64 bytes; host goes wrong */
-		if (bufhead > 0) {
-			if (g_timecnt == 0)
-				bufhead_bak = bufhead;
-			SysTimerDelay(1);
-			g_timecnt++;
-			if (g_timecnt > 2000) {
-				g_timecnt = 0;
-				if (bufhead_bak == bufhead)
-					bufhead = 0;
-			}
-		}
+//		if (bufhead > 0) {
+//			if (g_timecnt == 0)
+//				bufhead_bak = bufhead;
+//			SysTimerDelay(1);
+//			g_timecnt++;
+//			if (g_timecnt > 2000) {
+//				g_timecnt = 0;
+//				if (bufhead_bak == bufhead)
+//					bufhead = 0;
+//			}
+//		}
 	}
 }
 
@@ -768,11 +773,11 @@ void  bin_to_approm (void)
 
 		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
 		
-		if (i >= 56) {
-			
-			__NOP();
-			__NOP();
-		}
+//		if (i >= 56) {
+//			
+//			__NOP();
+//			__NOP();
+//		}
 
 	}
 	
@@ -894,6 +899,8 @@ void SYS_Init (void)
 	
 	PB->OFFD = 0x00000000;
 	PB->PUEN = 0x00000000;
+	
+	PB->PMD |= 0x01000000;
 
 	PD->DOUT = 0x00000000;
 	PD->PMD =  0x04140000;
