@@ -286,15 +286,15 @@ static int ParseCmd(unsigned char *buffer, uint8_t len, BOOL bUSB)
 		g_packno = inpw(pSrc);
 	}
 
-//	if ((lcmd) && (lcmd != CMD_RESEND_PACKET))
-//		gcmd = lcmd;
+	if ((lcmd) && (lcmd != CMD_RESEND_PACKET))   //這段不可以拿掉,會造成下載完成但APROM的內容皆為0xFFFF
+		gcmd = lcmd;
 
 //	if (lcmd == CMD_GET_FWVER)
 //		response[8] = FW_VERSION;
 //	else if (lcmd == CMD_GET_DEVICEID) {
 //		outpw(response + 8, SYS->PDID);
 //		goto out;
-//	} else
+//	} else 
 	if (lcmd == CMD_RUN_APROM || lcmd == CMD_RUN_LDROM ||
 		   lcmd == CMD_RESET) {
 		/* Set BS */
@@ -533,7 +533,20 @@ int32_t main()
 
 	PD->DOUT |= BIT10;
 	
-	//ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+
+	
+	if((POW_KEY) && (test_key == 1)) {
+
+_CHECK_ERR:
+		
+		while (1) {
+			ble_ota_step_function();
+			if (ble_ota_step == 4)
+				goto _ISP;
+		}
+	} else {
+		
+	
 	
 	ota_upate = SpiFlash_NormalRead(0);			
 
@@ -549,7 +562,7 @@ int32_t main()
 		bin_to_approm();
 		
 		spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
-		calculate_approm = get_approm_checksum = 0;
+		//calculate_approm = get_approm_checksum = 0;
 		//RTC->CAR = 0x0000A965;
 		//RTC->SPR0 = 0;
 	} else {
@@ -578,28 +591,14 @@ int32_t main()
 	
 	if (calculate_approm != get_approm_checksum) {
 	//if(0){
-		
-		__NOP();
-//		__NOP();
+
 		PD->DOUT&= ~BIT10;	
 		PD->DOUT &= ~BIT13;
 		PD->DOUT |= BIT9;	 // Blue
-		//while(1);
 		
 		goto _CHECK_ERR;
 	}
-	
-	
-	if((POW_KEY) && (test_key == 1)) {
-
-_CHECK_ERR:
-		
-		while (1) {
-			ble_ota_step_function();
-			if (ble_ota_step == 4)
-				goto _ISP;
-		}
-	} else {
+			
 		
 		goto _APROM;
 	
