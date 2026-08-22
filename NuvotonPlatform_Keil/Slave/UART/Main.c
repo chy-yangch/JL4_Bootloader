@@ -286,15 +286,16 @@ static int ParseCmd(unsigned char *buffer, uint8_t len, BOOL bUSB)
 		g_packno = inpw(pSrc);
 	}
 
-	if ((lcmd) && (lcmd != CMD_RESEND_PACKET))
-		gcmd = lcmd;
+//	if ((lcmd) && (lcmd != CMD_RESEND_PACKET))
+//		gcmd = lcmd;
 
-	if (lcmd == CMD_GET_FWVER)
-		response[8] = FW_VERSION;
-	else if (lcmd == CMD_GET_DEVICEID) {
-		outpw(response + 8, SYS->PDID);
-		goto out;
-	} else if (lcmd == CMD_RUN_APROM || lcmd == CMD_RUN_LDROM ||
+//	if (lcmd == CMD_GET_FWVER)
+//		response[8] = FW_VERSION;
+//	else if (lcmd == CMD_GET_DEVICEID) {
+//		outpw(response + 8, SYS->PDID);
+//		goto out;
+//	} else
+	if (lcmd == CMD_RUN_APROM || lcmd == CMD_RUN_LDROM ||
 		   lcmd == CMD_RESET) {
 		/* Set BS */
 		if (lcmd == CMD_RUN_APROM) {
@@ -464,13 +465,14 @@ static void CheckCksumBase()
 #endif
 
 //the smallest of APROM size is 2K
-static __inline uint32_t GetApromSize()
+//static __inline uint32_t GetApromSize()
+static uint32_t GetApromSize()
 {
-	uint32_t size = 0x800, data;
+	uint32_t size = 0x800, kdata;
 	int result;
 
 	do {
-		result = FMC_Read(size, &data);
+		result = FMC_Read(size, &kdata);
 		if (result < 0)
 			return size;
 		else
@@ -526,6 +528,9 @@ int32_t main()
 	//Read RTC RAM	
 	//approm_update = RTC->SPR0;
 
+	g_apromSize = GetApromSize();
+	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
+
 	PD->DOUT |= BIT10;
 	
 	//ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
@@ -537,8 +542,9 @@ int32_t main()
 	
 	
 	if (approm_update) {
-		PD->DOUT |= BIT10;
-		PD->DOUT |= BIT13;
+		
+		PD->DOUT = BIT9; //B
+		PD->DOUT |= BIT13; //G
 		
 		bin_to_approm();
 		
@@ -550,15 +556,15 @@ int32_t main()
 	
 	
 	
-	//PD->DOUT &= ~BIT10;
-	
-	// Flash Test
-	//view = SpiFlash_ReadMidDid();
-	calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum,***在這之前作ReadData動作會造成APROM數值異動,原因不明
-	get_approm_checksum = 0;
-	ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
-	//由APROM讀出的checksum需再次反轉
-	get_approm_checksum=__REV(get_approm_checksum);
+		//PD->DOUT &= ~BIT10;
+		
+		// Flash Test
+		//view = SpiFlash_ReadMidDid();
+		calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum,***在這之前作ReadData動作會造成APROM數值異動,原因不明
+	//	get_approm_checksum = 0;
+		ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+		//由APROM讀出的checksum需再次反轉
+		get_approm_checksum=__REV(get_approm_checksum);
 	}
 	//default_flash_rom();
 	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
@@ -567,13 +573,18 @@ int32_t main()
 
 	//while(1);
 
-	SysTimerDelay(5000000);
+	SysTimerDelay(500000);
 //	goto _APROM;
 	
 	if (calculate_approm != get_approm_checksum) {
+	//if(0){
 		
 		__NOP();
-//		__NOP();		
+//		__NOP();
+		PD->DOUT&= ~BIT10;	
+		PD->DOUT &= ~BIT13;
+		PD->DOUT |= BIT9;	 // Blue
+		//while(1);
 		
 		goto _CHECK_ERR;
 	}
@@ -694,7 +705,7 @@ void TMR0_IRQHandler(void)
 		if (led_mode == 2) {
 			led_mode = 1;
 			TIMER1->CMPR = 600000;
-			TIMER1->DR = 0;
+			//TIMER1->DR = 0;
 		}
 		led_tt++;
 	} else {
@@ -909,6 +920,7 @@ void SYS_Init (void)
 
 	//PD->DOUT = 0x00000000;
 	PD->PMD =  0x04140000;
+	PD->DOUT = 0x0000D9FF;
 	//SYS->PD_H_MFP =	0x00000000;
 	//SYS->PD_L_MFP = 0x00000000;
 	//PD->PUEN = 0x00000000;
@@ -923,7 +935,7 @@ void SYS_Init (void)
 	/* Lock protected registers */
 	/* Give a dummy target frequency here. */
 	/* Will over write capture resolution with macro */
-	TIMER0->PRECNT = 0x00000000;
+	//TIMER0->PRECNT = 0x00000000;
 	TIMER0->CMPR   = 12000000 - 1; /* go into interrupt, BASE_TIME counts */
 	TIMER0->CTL    = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
 	/* Enable timer interrupt */
@@ -931,7 +943,7 @@ void SYS_Init (void)
 	NVIC_SetPriority(TMR0_IRQn, 2);
 	NVIC_EnableIRQ(TMR0_IRQn);
 
-	TIMER1->PRECNT = 0x00000000;
+	//TIMER1->PRECNT = 0x00000000;
 	TIMER1->CMPR   = 2000000  ;
 	TIMER1->CTL = TIMER_CTL_TMR_EN_Msk | TIMER_PERIODIC_MODE;
 	TIMER1->IER |= TIMER_IER_TMR_IE_Msk;
@@ -940,11 +952,6 @@ void SYS_Init (void)
 
 	//while (1);
 	
-	/* Enable VCC power */
-	FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
-
-	g_apromSize = GetApromSize();
-	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
 
 	g_pdid = SYS->PDID;
 #ifdef UART0_TEST
@@ -962,6 +969,17 @@ void SYS_Init (void)
 	SysTick->VAL  = 0x00;
 	SysTick->CTRL = SysTick->CTRL | (1 << SysTick_CTRL_CLKSOURCE_Pos) |
 			(1 << SysTick_CTRL_ENABLE_Pos);
+
+
+
+	/* Enable VCC power */
+	FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
+
+	__NOP();
+	__NOP();
+//	g_apromSize = GetApromSize();
+//	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
+
 
 
     APO_PIN = 0;
