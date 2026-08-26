@@ -16,34 +16,33 @@
 //#define JL4PR
 //#define JL4PC
 
-#define FW_BIN_ADDR	0x1000
-//#define FW_BIN_ADDR	0x0000 //test
+#define FW_BIN_ADDR				0x1000
 
 #define USING_AUTODETECT
 
-#define PACKET_SIZE		64
+#define PACKET_SIZE				64
 
-#define CMD_UPDATE_APROM	0x000000A0
+#define CMD_UPDATE_APROM		0x000000A0
 #define CMD_UPDATE_CONFIG	0x000000A1
-#define CMD_READ_CONFIG	0x000000A2
-#define CMD_ERASE_ALL		0x000000A3
-#define CMD_SYNC_PACKNO	0x000000A4
-#define CMD_GET_FWVER		0x000000A6
+#define CMD_READ_CONFIG		0x000000A2
+#define CMD_ERASE_ALL			0x000000A3
+#define CMD_SYNC_PACKNO		0x000000A4
+#define CMD_GET_FWVER			0x000000A6
 #define CMD_RUN_APROM		0x000000AB
 #define CMD_RUN_LDROM		0x000000AC
-#define CMD_RESET			0x000000AD
-#define CMD_CONNECT		0x000000AE
+#define CMD_RESET				0x000000AD
+#define CMD_CONNECT			0x000000AE
 #define CMD_DISCONNECT		0x000000AF
 
-#define CMD_GET_DEVICEID	0x000000B1
+#define CMD_GET_DEVICEID		0x000000B1
 
 #define CMD_UPDATE_DATAFLASH	0x000000C3
-#define CMD_WRITE_CHECKSUM	0x000000C9
+#define CMD_WRITE_CHECKSUM		0x000000C9
 #define CMD_GET_FLASHMODE		0x000000CA
 
 #define CMD_RESEND_PACKET		0x000000FF
 
-#define	V6M_AIRCR_VECTKEY_DATA	0x05FA0000UL
+#define V6M_AIRCR_VECTKEY_DATA		0x05FA0000UL
 #define V6M_AIRCR_SYSRESETREQ		0x00000004UL
 
 #define DISCONNECTED	0
@@ -54,28 +53,42 @@
 #define BLE_EN                  	PC4
 #define BLE_STATUS         	PC5
 #define BLE_WAKEUP       	PC6
+
 // LED
-#define SYNC_LED			PC1
+#define BLUE_LED		PD9
+#define RED_LED			PD10
+#define GREEN_LED		PD13
 
 #define APO_PIN			PC14
+
+//Flash
 #define TSL_PIN			PA5
 #define FCS_PIN			PA6
 
+//KEY
 #define POW_KEY			PA3
-#define BLE_LED			PD9
 
-//#define RTC_SPR_BASE        0x40008000UL
-//#define RTC_RWEN        	(*(volatile uint32_t *)(RTC_SPR_BASE + 0x20))
-//#define RTC_SPR(n)      		(*(volatile uint32_t *)(RTC_SPR_BASE + 0x40 + ((n) * 4)))
+void Delay(uint32_t delayCnt);
+void SysTimerDelay(uint32_t us);
+uint32_t calculate_aprom_checksum(void);
+void  bin_to_approm (void);
+void SYS_Init (void);
+void ble_ota_io_init(void);
+void ble_mode_cmd_m(void);
+void ble_ota_step_function (void);
+
 
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
+
 __align(4) static uint8_t uart_rcvbuf[64];
 __align(4) static uint8_t uart_sendbuf[64];
 __align(4) static uint8_t aprom_buf[PAGE_SIZE];
+
 BOOL bUsbDataReady, bUartDataReady;
 BOOL bUsbInReady, bUpdateApromCmd;
 uint32_t g_apromSize, g_dataFlashAddr, g_dataFlashSize;
+
 volatile uint32_t g_pdid, g_timecnt;
 volatile uint16_t timer0_cnt = 0, timer0_start = 0, timer0_cnt1 = 0;
 volatile uint8_t  start_chk = 0;
@@ -85,10 +98,10 @@ __IO uint8_t ble_ota_status;	//0:init IO,
 						//2:wait command 'M' ack
 						//3:wait meter tyep check 
 
-#ifdef SUPPORT_WRITECKSUM
-static uint32_t g_ckbase = (0x20000 - 8);
-static void CheckCksumBase(void);
-#endif
+__IO uint8_t ble_ota_step = 0;
+__IO uint8_t ble_ota_cmd_retry_cnt;
+
+
 
 #ifdef UART0_TEST
 static UART_T  *g_pUART = UART0;
@@ -98,33 +111,22 @@ static UART_T  *g_pUART = UART1;
 static IRQn_Type	g_UARTIRQ = UART1_IRQn;
 #endif
 
-void Delay(uint32_t delayCnt);
-void my_memcpy(void *dest, void *src, int32_t size);
-extern void WordsCpy(void *dest, void *src, int32_t size);
-void SysTimerDelay(uint32_t us);
 
 volatile uint32_t lcmd_reg;
 volatile uint16_t led_tt = 0;
 volatile uint16_t led_mode = 0;
-
 volatile uint32_t fmc_data;
 
-__IO uint8_t ble_ota_step = 0;
-__IO uint8_t ble_ota_cmd_retry_cnt;
+__IO uint32_t view,test_key = 1;
+__IO uint32_t aprom_sum;
+__IO uint32_t flash_checksum,calculate_approm,get_approm_checksum,ota_upate;
 
-uint32_t calculate_aprom_checksum(void);
-void  bin_to_approm (void);
-void default_flash_rom(void);
-void SYS_Init (void);
-void ble_ota_io_init(void);
-void ble_mode_cmd_m(void);
-void ble_ota_step_function (void);
 
 /* 從Flash讀出序號, 20170407 */
-
-int FMC_Read1(unsigned int address)
+int32_t FMC_Read1(unsigned int address)
 {
 	unsigned int Reg;
+	int32_t int32_data;
 	
 	outp32(ISPCMD, ISP_Read);
 	outp32(ISPADR, address);
@@ -138,10 +140,10 @@ int FMC_Read1(unsigned int address)
 		outp32(FISPCON, Reg);
 		return -1;
 	}
+	
+	int32_data  = inp32(ISPDAT);
 
-	fmc_data  = inp32(ISPDAT);
-
-	return 0;
+	return int32_data;
 }
 
 //-------------------------------------------------------------------------------------------
@@ -204,12 +206,7 @@ void UART1_IRQHandler(void)//UART1_IRQHandler
 static __inline void UartInit(void)
 {
 
-	/* PB.13(RX) PB.14(TX)   */
-//	SYS->PC_H_MFP = ((SYS->PC_H_MFP & ~0x0000000F) | 0x00000007);
-	/* PB.13(RX) PB.14(TX)   */
-//	SYS->PC_L_MFP = ((SYS->PC_L_MFP & ~0xF0000000) | 0x70000000);
-
-#ifdef UART0_TEST
+	#ifdef UART0_TEST
 	CLK->APBCLK |=
 		CLK_APBCLK_UART0_EN_Msk;          /* enable UART0 clock */
 #else
@@ -226,8 +223,7 @@ static __inline void UartInit(void)
 	g_pUART->IER = UART_IER_RTO_IE_Msk | UART_IER_RDA_IE_Msk;
 }
 
-
-static uint16_t Checksum(unsigned char *buf, int len)
+ uint16_t Checksum(unsigned char *buf, int len)
 {
 	int i;
 	uint16_t c;
@@ -335,19 +331,6 @@ static int ParseCmd(unsigned char *buffer, uint8_t len, BOOL bUSB)
 		bUpdateApromCmd = TRUE;
 	}
 
-
-#ifdef SUPPORT_WRITECKSUM
-	else if (lcmd == CMD_WRITE_CHECKSUM) { //write cksum to aprom last
-		cktotallen = inpw(pSrc);
-		lcksum = inpw(pSrc + 4);
-		CheckCksumBase();
-		ReadData(g_ckbase & 0xFFE00, g_ckbase, (uint32_t *)aprom_buf);
-		outpw(aprom_buf + PAGE_SIZE - 8, cktotallen);
-		outpw(aprom_buf + PAGE_SIZE - 4, lcksum);
-		FMC_Erase(g_ckbase & 0xFFE00);
-		WriteData(g_ckbase & 0xFFE00, g_ckbase + 8, (uint32_t *)aprom_buf);
-	}
-#endif
 	else if (lcmd == CMD_GET_FLASHMODE) {
 		outpw(response + 8, (inpw(&FMC->ISPCON) & 0x2) ? 2 : 1);
 	}
@@ -435,31 +418,6 @@ void SysTimerDelay(uint32_t us)
 	while ((SysTick->CTRL & (1 << 16)) == 0);
 }
 
-#ifdef SUPPORT_WRITECKSUM
-static void CheckCksumBase()
-{
-	unsigned int aprom_end = g_apromSize, data;
-	int result;
-
-	result = FMC_Read(0x1F000 - 8, &data);
-	if (result == 0) {	//128K flash
-		FMC_Read(Config0, &data);
-		if ((data & 0x01) == 0) //DFEN enable
-			FMC_Read(Config1, &aprom_end);
-		g_ckbase = aprom_end - 8;
-		return;
-	} else {	// less than 128K
-		aprom_end = 0x10000;//64K
-		do {
-			result = FMC_Read(aprom_end - 8, &data);
-			if (result == 0)
-				break;
-			aprom_end = aprom_end / 2;
-		} while (aprom_end > 4096);
-		g_ckbase = aprom_end - 8;
-	}
-}
-#endif
 
 //the smallest of APROM size is 2K
 //static __inline uint32_t GetApromSize()
@@ -486,28 +444,13 @@ void CLK_SysTickDelay(uint32_t us)
 	/* Waiting for down-count to zero */
 	while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0);
 }
-__IO uint32_t view,test_key = 1;
-__IO uint8_t approm_update = 0;
-//__IO uint32_t dd = 0x12345678;
-//__IO uint8_t reg[10] ={0};
-__IO uint32_t aprom_sum;
 
-__IO uint32_t flash_checksum,calculate_approm,get_approm_checksum,ota_upate;
 
 int32_t main()
 {
 	extern uint32_t SystemCoreClock;
 	uint8_t volatile bufhead_bak = 0;
-	uint8_t   i,*ptr;
-	//uint32_t flash_checksum,calculate_approm,get_approm_checksum;
-
-	
-//	ptr = (uint8_t *)&dd;
-//	
-//	reg[0] = *(ptr + 3);
-//	reg[1] = *(ptr + 2);
-//	reg[2] = *(ptr + 1);
-//	reg[3] = *(ptr + 0);
+	uint8_t   i;
 	
 	SYS_Init();
 
@@ -516,23 +459,11 @@ int32_t main()
 	//RTC_SPR(0) = 0x12345678;
 	//RTC_SPR(1) = 0xABCDEF01;
 	//RTC_SPR(2) = 0x00000055;
-	
-	// Enable Write RTC RAM
-	//RTC->CAR = 0x0000A965;
-	//Write RTC RAM
-	//RTC->SPR0 = 0x12345678;
-	//RTC->SPR1 = 0xABCDEF01;
-	//Read RTC RAM	
-	//approm_update = RTC->SPR0;
 
-	g_apromSize = GetApromSize();
-	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
-
-	PD->DOUT |= BIT10;
-	
-
-	
+	//PD->DOUT |= BIT10;	//R
+	RED_LED = 1;
 	if((POW_KEY) && (test_key == 1)) {
+	//if (1) {
 
 _CHECK_ERR:
 		
@@ -543,63 +474,36 @@ _CHECK_ERR:
 		}
 	} else {
 		
-	
-	
-	ota_upate = SpiFlash_NormalRead(0);			
-
-	if (ota_upate == 0)
-		approm_update = 1;
-	
-	
-	//if (approm_update) {
-	if (RTC->SPR0 == 0x02) {
-		
-		PD->DOUT = BIT9; //B
-		PD->DOUT |= BIT13; //G
-		
-		bin_to_approm();
-		
-		//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
-		//calculate_approm = get_approm_checksum = 0;
-		RTC->CAR = 0x0000A965;
-		RTC->SPR0 = 0;
-	} else {
-	
-	
-	
-		//PD->DOUT &= ~BIT10;
-		
-		// Flash Test
-		//view = SpiFlash_ReadMidDid();
-		calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum,***在這之前作ReadData動作會造成APROM數值異動,原因不明
-	//	get_approm_checksum = 0;
-		ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
-		//由APROM讀出的checksum需再次反轉
-		get_approm_checksum=__REV(get_approm_checksum);
-	}
-	//default_flash_rom();
-	//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
-	//SpiFlash_NormalPageProgram(0,0x11223344);	    
-	//flash_checksum = SpiFlash_NormalRead(0);
-
-	//while(1);
-
-	SysTimerDelay(500000);
-//	goto _APROM;
-	
-	if (calculate_approm != get_approm_checksum) {
-	//if(0){
-
-		PD->DOUT&= ~BIT10;	
-		PD->DOUT &= ~BIT13;
-		PD->DOUT |= BIT9;	 // Blue
-		
-		goto _CHECK_ERR;
-	}
+		//Run APROM Update
+		if (RTC->SPR0 == 0x02) {
 			
+			GREEN_LED = 1;
+			BLUE_LED = 1;
+			
+			bin_to_approm();
+
+			RTC->CAR = 0x0000A965;
+			RTC->SPR0 = 0;
+		} 
 		
-		goto _APROM;
-	
+		// Flash check
+		calculate_approm = calculate_aprom_checksum();	//計算31.5K - 4 Bytes的APROM checksum,***在debug模式下這之前作ReadData動作會造成APROM數值異動
+		ReadData( 0x7DFC,  0X7E00, (uint32_t *)&get_approm_checksum); // 取得儲存於APROM最後4 Bytes的chekcsum
+		get_approm_checksum=__REV(get_approm_checksum);//由APROM讀出的checksum需再次反轉
+
+
+		//SysTimerDelay(100000);
+
+		if (calculate_approm != get_approm_checksum) {
+			
+			RED_LED = 0;
+			GREEN_LED = 0;
+			BLUE_LED = 1;
+			
+			goto _CHECK_ERR;
+		}
+
+			goto _APROM;
 	}
 
 _APROM:
@@ -619,50 +523,16 @@ _RST:
 	while (1);
 _ISP:
 	while (1) {
+
 		if (bUartDataReady == TRUE) {
+
 			bUartDataReady = FALSE;
-			if ((uart_rcvbuf[1] == 'B') &&
-			    (uart_rcvbuf[2] == 'L') &&
-			    (uart_rcvbuf[3] == 'E')) {
-				FMC_Write(0X7E00, 0X424C4500);
-				goto _APROM;
-			} else {	/* 硬體序號 + 機種碼 */
-				if (uart_rcvbuf[2] == 'E') {
-					for (i = 0; i < 12; i++)
-						uart_sendbuf[i] = 0;
-					uart_sendbuf[0] = '#';
-					uart_sendbuf[1] = 10;
-					uart_sendbuf[2] = 'E';
-					uart_sendbuf[3] = 'A';
-					uart_sendbuf[4] = 'A';
-
-
-					#if defined(JL4PR)
-						uart_sendbuf[5] = 'B';
-						uart_sendbuf[6] = 'G';
-					#elif defined(JL4RH)
-						uart_sendbuf[5] = 'B';
-						uart_sendbuf[6] = 'H';
-					#elif defined(JL4PC)
-						uart_sendbuf[5] = 'B';
-						uart_sendbuf[6] = 'F';
-					#else
-					 __NOP();
-					 __NOP();
-					#endif
-					
-
-					for (i = 0; i < uart_sendbuf[1] - 3; i++)
-						uart_sendbuf[uart_sendbuf[1] - 3] += uart_sendbuf[i];
-					uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
-					uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
-					PutString(uart_sendbuf[1]);
-				} else { /* UPD packet handshake */
-					g_timecnt = 0;
-					ParseCmd(uart_rcvbuf, PACKET_SIZE, FALSE);
-					PutString(16);
-				}
-			}
+			
+			/* UPD packet handshake */
+			g_timecnt = 0;
+			ParseCmd(uart_rcvbuf, PACKET_SIZE, FALSE);
+			PutString(16);
+			
 		}
 
 //		if (PA->PIN & 0x00000008) {
@@ -674,24 +544,24 @@ _ISP:
 //			timer0_cnt1 = 0;
 //		}
 		
-//		if (lcmd_reg == CMD_RUN_APROM) {
-//			if (led_tt >= 30) {
-//				goto _RST;
-//			} else
-//				__NOP();
-//		}
+		if (lcmd_reg == CMD_RUN_APROM) {
+			if (led_tt >= 30) {
+				goto _RST;
+			} else
+				__NOP();
+		}
 	/* timeout happen; but byte is less than 64 bytes; host goes wrong */
-//		if (bufhead > 0) {
-//			if (g_timecnt == 0)
-//				bufhead_bak = bufhead;
-//			SysTimerDelay(1);
-//			g_timecnt++;
-//			if (g_timecnt > 2000) {
-//				g_timecnt = 0;
-//				if (bufhead_bak == bufhead)
-//					bufhead = 0;
-//			}
-//		}
+		if (bufhead > 0) {
+			if (g_timecnt == 0)
+				bufhead_bak = bufhead;
+			SysTimerDelay(1);
+			g_timecnt++;
+			if (g_timecnt > 2000) {
+				g_timecnt = 0;
+				if (bufhead_bak == bufhead)
+					bufhead = 0;
+			}
+		}
 	}
 }
 
@@ -720,15 +590,17 @@ void TMR1_IRQHandler(void)
 	switch (led_mode) {
 	case 1:
 		
-		PD->DOUT ^= BIT9;
+		//PD->DOUT ^= BIT9;
+		BLUE_LED ^= 1;
 		break;
 	case 2:
 
-		PD->DOUT ^= BIT9;
+		//PD->DOUT ^= BIT9;
+		BLUE_LED ^= 1;
 		break;
 	}
 }
-//__IO uint32_t k = 0;
+
 uint32_t calculate_aprom_checksum(void)			//約50ms完成
 {
 	uint16_t i,j;
@@ -746,13 +618,13 @@ uint32_t calculate_aprom_checksum(void)			//約50ms完成
 			
 			for (j = 0; j < 512;j++) {
 				check_sum+= upd_data[j];
-				//k++;
+
 			}
 		} else {
 			//最後4Bytes為checksum不進行加總運算
 			for (j = 0; j < 508;j++) {
 				check_sum+= upd_data[j];
-				//k++;
+
 			}
 		}
 	}
@@ -765,7 +637,6 @@ void  bin_to_approm (void)
 {
 	
 	uint32_t data_upd_data[128],addr,u32_data,i,j;
-	//uint16_t i,j;
 
 	EraseAP(FALSE, 0, 0x00007E00);	
 	
@@ -785,56 +656,14 @@ void  bin_to_approm (void)
 		}
 
 		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
-		
-//		if (i >= 56) {
-//			
-//			__NOP();
-//			__NOP();
-//		}
-
 	}
-	
-//	uint32_t data_upd_data[128],addr;
-//	uint16_t i,j;
-
-//	//更新31.5K,其中0.5K儲存設定值
-//	for (i = 0; i < 63; i++) {
-
-//		for (j = 0; j < 128; j++) {
-//			
-//			addr = FW_BIN_ADDR + (j * 4) + ( i * 512);
-//			data_upd_data[j] = SpiFlash_NormalRead(addr);
-//			//data_upd_data[j] = SpiFlash_NormalRead(FW_BIN_ADDR + j + (i * 128));
-//			
-//		}
-
-//		WriteData(i * 0x200, (i * 0x200 )+ 0x200, (uint32_t *)data_upd_data);
-
-//	}
-
 }
-/*
- * 寫Flash內定值進行測試
-*/
-void default_flash_rom(void)
-{
-	uint16_t i = 0;
-	
-	SpiFlash_ChipErase_logger(0);
-	
-	for (i = 0; i < 32768; i++)
-		SpiFlash_NormalPageProgram(i,i);
-	
-}
+
 void SYS_Init (void)
 {
 	int32_t i32TimeOutCnt;
 	
 	/* Init System, peripheral clock and multi-function I/O */
-
-#ifdef SUPPORT_WRITECKSUM
-	uint32_t totallen, cksum;
-#endif
 
 	UNLOCKREG();
 
@@ -947,9 +776,6 @@ void SYS_Init (void)
 	NVIC_SetPriority(TMR1_IRQn, 2);
 	NVIC_EnableIRQ(TMR1_IRQn);
 
-	//while (1);
-	
-
 	g_pdid = SYS->PDID;
 #ifdef UART0_TEST
 	g_pUART = UART0;
@@ -968,14 +794,13 @@ void SYS_Init (void)
 			(1 << SysTick_CTRL_ENABLE_Pos);
 
 
-
 	/* Enable VCC power */
 	FMC->ISPCON |= FMC_ISPCON_ISPEN_Msk;
 
 	__NOP();
 	__NOP();
-//	g_apromSize = GetApromSize();
-//	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
+	g_apromSize = GetApromSize();
+	GetDataFlashInfo(&g_dataFlashAddr, &g_dataFlashSize);
 
 
 
@@ -1039,37 +864,37 @@ void ble_ota_io_init(void)
 	start_chk = 2;
 	timer0_cnt = 0;
 	//PD->DOUT |= BIT9;
-	BLE_LED = 1;
+	BLUE_LED = 1;
 	
 
 }
 
+
 void ble_mode_cmd_m(void)
 {
-	uint8_t i;
+	uint8_t i,*ptr;
+	uint32_t u32;
 	
 	BLE_wakeup();
 	for (i = 0; i < 10; i++)
 		uart_sendbuf[i] = 0;
 
-	FMC_Read1(0x7A00);
-	if (fmc_data == 0xFFFFFFFF) {
-		FMC_Read1(0x79FC);
+	//Read meter SN
+	u32 = FMC_Read1(0x7E00);
 
-		uart_sendbuf[3] =
-			(uint8_t)(fmc_data & 0x000000FF);
-		uart_sendbuf[4] =
-			(int8_t)((fmc_data & 0x0000FF00) >> 8);
-		uart_sendbuf[5] =
-			(int8_t)((fmc_data & 0x00FF0000) >> 16);
-		uart_sendbuf[6] =
-			(int8_t)((fmc_data & 0xFF000000) >> 24);
-	} else {
-		for (i = 0; i < 6; i++) {
-			FMC_Read1(0x7A00 + i * 4);
-			uart_sendbuf[3 + i] = (uint8_t)fmc_data;
-		}
-	}
+	if (fmc_data == 0xFFFFFFFF)
+		u32 = 0x12345678;		//defult
+	else
+		__NOP();
+
+	ptr = (uint8_t *)&u32;
+	
+	uart_sendbuf[3] = * (ptr + 3);
+	uart_sendbuf[4] = * (ptr + 2);
+	uart_sendbuf[5] = * (ptr + 1);
+	uart_sendbuf[6] = * (ptr + 0);
+	
+	
 	uart_sendbuf[0] = '#';
 	uart_sendbuf[1] = 14;
 	uart_sendbuf[2] = 'M';
