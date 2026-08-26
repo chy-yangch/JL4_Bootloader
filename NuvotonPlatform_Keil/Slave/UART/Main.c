@@ -125,9 +125,6 @@ void ble_ota_step_function (void);
 int FMC_Read1(unsigned int address)
 {
 	unsigned int Reg;
-
-	
-	/* FMC 如果內容空白有時直接更新OTA,其內容皆為0xFFFF*/
 	
 	outp32(ISPCMD, ISP_Read);
 	outp32(ISPADR, address);
@@ -554,17 +551,18 @@ _CHECK_ERR:
 		approm_update = 1;
 	
 	
-	if (approm_update) {
+	//if (approm_update) {
+	if (RTC->SPR0 == 0x02) {
 		
 		PD->DOUT = BIT9; //B
 		PD->DOUT |= BIT13; //G
 		
 		bin_to_approm();
 		
-		spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
+		//spi_flash_erase(SPI_FLASH_4KB_ERASE,0);
 		//calculate_approm = get_approm_checksum = 0;
-		//RTC->CAR = 0x0000A965;
-		//RTC->SPR0 = 0;
+		RTC->CAR = 0x0000A965;
+		RTC->SPR0 = 0;
 	} else {
 	
 	
