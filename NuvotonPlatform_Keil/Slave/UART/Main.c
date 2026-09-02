@@ -16,7 +16,7 @@
 //#define JL4PR
 //#define JL4PC
 
-#define FW_BIN_ADDR				0x1000
+#define FW_BIN_ADDR				0x3F8000
 
 #define USING_AUTODETECT
 
