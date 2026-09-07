@@ -462,7 +462,7 @@ int32_t main()
 
 	//PD->DOUT |= BIT10;	//R
 	RED_LED = 1;
-	if((POW_KEY) && (test_key == 1)) {
+	if((!POW_KEY) && (test_key == 1)) {
 	//if (1) {
 
 _CHECK_ERR:
@@ -686,6 +686,7 @@ void SYS_Init (void)
 	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
 	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN | CLK_APBCLK_RTC_EN;
 
+	PB->PMD |= 0x01000000;	
     #if defined(JL4PR)
 	PA->DOUT = 0x00000000;
 	SYS->PA_H_MFP =	0x00000000;
