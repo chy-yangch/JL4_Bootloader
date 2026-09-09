@@ -67,6 +67,7 @@
 
 //KEY
 #define POW_KEY			PA3
+#define OTHER_KEY		PB15
 
 void Delay(uint32_t delayCnt);
 void SysTimerDelay(uint32_t us);
@@ -462,7 +463,7 @@ int32_t main()
 
 	//PD->DOUT |= BIT10;	//R
 	RED_LED = 1;
-	if((!POW_KEY) && (test_key == 1)) {
+	if((!POW_KEY) && (OTHER_KEY)) {
 	//if (1) {
 
 _CHECK_ERR:
