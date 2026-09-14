@@ -78,6 +78,7 @@ void ble_ota_io_init(void);
 void ble_mode_cmd_m(void);
 void ble_ota_step_function (void);
 void ble_mode_cmd_U(void);
+uint8_t wait_meter_tyep_check(void);
 
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
@@ -463,18 +464,25 @@ int32_t main()
 
 	//PD->DOUT |= BIT10;	//R
 	RED_LED = 1;
-	//if((!POW_KEY) && (OTHER_KEY)) {
-	if (1) {
+	if((!POW_KEY) && (OTHER_KEY)) {
+	//if (1) {
 
 _CHECK_ERR:
 		
 		while (1) {
-			ble_ota_step_function();
-			//if (ble_ota_step == 4)
+
 			if (BLE_STATUS) {
-				RED_LED = 0;
-				goto _ISP;
 				
+				RED_LED = 0;
+				
+				if(wait_meter_tyep_check())
+					goto _ISP;
+				else
+					__NOP();
+				
+			} else {
+			
+				ble_ota_step_function();
 			}
 		}
 	} else {
@@ -539,15 +547,6 @@ _ISP:
 			PutString(16);
 			
 		}
-
-//		if (PA->PIN & 0x00000008) {
-//			timer0_start = 1;
-//			if (timer0_cnt1 >= 5)
-//				goto _RST;
-//		} else {
-//			timer0_start = 0;
-//			timer0_cnt1 = 0;
-//		}
 		
 		if (lcmd_reg == CMD_RUN_APROM) {
 			if (led_tt >= 30) {
@@ -956,38 +955,51 @@ uint8_t wait_meter_tyep_check(void)
 
 	if (bUartDataReady == TRUE) {
 		bUartDataReady = FALSE;
-		if (uart_rcvbuf[2] == 'E') {
+	
+		if (uart_rcvbuf[2] == 'U') {
+			
 			for (i = 0; i < 12; i++)
 				uart_sendbuf[i] = 0;
-		}
-		uart_sendbuf[0] = '#';
-		uart_sendbuf[1] = 10;
-		uart_sendbuf[2] = 'E';
-		uart_sendbuf[3] = 'A';
-		uart_sendbuf[4] = 'A';
+			
+			ack = 0;
+			
+		} else {
 		
-		#if defined(JL4PR)
-			uart_sendbuf[5] = 'B';
-			uart_sendbuf[6] = 'G';
-		#elif defined(JL4RH)
-			uart_sendbuf[5] = 'B';
-			uart_sendbuf[6] = 'H';
-		#elif defined(JL4PC)
-			uart_sendbuf[5] = 'B';
-			uart_sendbuf[6] = 'F';
-		#else
-		 __NOP();
-		 __NOP();
-		#endif
+			if (uart_rcvbuf[2] == 'E') {
+				for (i = 0; i < 12; i++)
+					uart_sendbuf[i] = 0;
+			}
+			uart_sendbuf[0] = '#';
+			uart_sendbuf[1] = 10;
+			uart_sendbuf[2] = 'E';
+			uart_sendbuf[3] = 'A';
+			uart_sendbuf[4] = 'A';
+			
+			#if defined(JL4PR)
+				uart_sendbuf[5] = 'B';
+				uart_sendbuf[6] = 'G';
+			#elif defined(JL4RH)
+				uart_sendbuf[5] = 'B';
+				uart_sendbuf[6] = 'H';
+			#elif defined(JL4PC)
+				uart_sendbuf[5] = 'B';
+				uart_sendbuf[6] = 'F';
+			#else
+			 __NOP();
+			 __NOP();
+			#endif
 
-		for (i = 0; i < uart_sendbuf[1] - 3; i++)
-			uart_sendbuf[uart_sendbuf[1] - 3] +=
-				uart_sendbuf[i];
-		uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
-		uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
-		PutString(uart_sendbuf[1]);
+			for (i = 0; i < uart_sendbuf[1] - 3; i++)
+				uart_sendbuf[uart_sendbuf[1] - 3] +=
+					uart_sendbuf[i];
+			uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
+			uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
+			PutString(uart_sendbuf[1]);
 
-		ack = 1;
+			ack = 1;
+		
+		}
+
 	} else {
 		ack = 0;
 	}
@@ -1005,41 +1017,16 @@ void ble_ota_step_function (void)
 			break;
 		
 		case 1:
-			ble_mode_cmd_U();
-			//ble_mode_cmd_m();
-			ble_ota_step = 2;
-			ble_ota_cmd_retry_cnt = 0;
-			break;
-		
-		case 2:
+			if (ble_ota_cmd_retry_cnt) {
 				
-			if (ble_ota_cmd_retry_cnt > 2) {
-				
+				ble_mode_cmd_U();
+				//ble_mode_cmd_m();
 				ble_ota_step = 1;
-
-			} else  {
-		
-//				if (wait_cmd_m_ack())
-//					//ble_ota_step = 3;
-//					ble_ota_step = 1;
+				ble_ota_cmd_retry_cnt = 0;
 			}
 			
 			break;
-		
-		case 3 :
-			
-			if(wait_meter_tyep_check()) 
-				ble_ota_step = 4;
-
-			break;
-		
-		case 4 :
-			
-			__NOP();
-			
-			break;
 	}
-
 }
 
 void ble_mode_cmd_U(void)
@@ -1057,28 +1044,58 @@ void ble_mode_cmd_U(void)
 	uart_sendbuf[0] = 0x23;
 	uart_sendbuf[1] = 0x31;
 	uart_sendbuf[2] = 'U';
-	uart_sendbuf[3] = 0x1C;
+
+//	uart_sendbuf[3] = 0x1C;
+	
+	uart_sendbuf[3] = 0x1E;
 	uart_sendbuf[4] = 0xFF;
 
 	
 	uart_sendbuf[5] = 0x46;	//F
 	uart_sendbuf[6] = 0x50;	//P
-	uart_sendbuf[7] = 0x42;	//B
-	uart_sendbuf[8] = 0x47;	//G
+	uart_sendbuf[7] = 'B';	//B
+	uart_sendbuf[8] = 'H';	//H
+
 	
+//	uart_sendbuf[9]  = 0x17;	//Year
+//	uart_sendbuf[10] = 0x04;	//month
+//	uart_sendbuf[11] = 0x00;	//hour
+//	uart_sendbuf[12] = 0x06;	//min
+
+	//Read meter SN
+	u32 = FMC_Read1(0x7E00);
+
+	if (fmc_data == 0xFFFFFFFF)
+		u32 = 0x12345678;		//defult
+	else
+		__NOP();
+
+	ptr = (uint8_t *)&u32;
 	
-	uart_sendbuf[9] = 0x17;	//Year
-	uart_sendbuf[10] = 0x04;	//month
-	uart_sendbuf[11] = 0x00;	//hour
-	//uart_sendbuf[12] = 0x03;	//min
-	uart_sendbuf[12] = 0x04;	//min
+	uart_sendbuf[9] =   * (ptr + 0);		//SN
+	uart_sendbuf[10] = * (ptr + 1);
+	uart_sendbuf[11] = * (ptr + 2);
+	uart_sendbuf[12] = * (ptr + 3);
 	
 	
 	uart_sendbuf[13] = 0x04;
-	uart_sendbuf[14] = 0x20;
-	uart_sendbuf[15] = 0x17;
-	uart_sendbuf[16] = 0x04;	
-	uart_sendbuf[17] = 0x06;
+	
+	
+	u32 = FMC_Read1(0x7E04);
+	
+	ptr = (uint8_t *)&u32;
+	
+//	uart_sendbuf[14] = 0x20;	// CAL date
+//	uart_sendbuf[15] = 0x17;
+//	uart_sendbuf[16] = 0x04;	
+//	uart_sendbuf[17] = 0x06;
+	
+	uart_sendbuf[14] = * (ptr + 0);	// CAL date
+	uart_sendbuf[15] = * (ptr + 1);
+	uart_sendbuf[16] = * (ptr + 2);	
+	uart_sendbuf[17] = * (ptr + 3);
+
+	
 	uart_sendbuf[18] = 0xEC;
 	uart_sendbuf[19] = 0x14;
 	uart_sendbuf[20] = 0xBB;
@@ -1096,8 +1113,17 @@ void ble_mode_cmd_U(void)
 	uart_sendbuf[32] = 0x00;
 	uart_sendbuf[33] = 0x00;
 	
-	uart_sendbuf[34] = 'A';
-	uart_sendbuf[35] = 'A';
+	//uart_sendbuf[34] = 'A';		//Hardware Version
+	//uart_sendbuf[35] = 'A';
+	
+	u32 = FMC_Read1(0x7E08);
+	
+	ptr = (uint8_t *)&u32;	
+	
+	
+	uart_sendbuf[34] = * (ptr + 0); //Hardware Version
+	uart_sendbuf[35] = * (ptr + 1);
+	
 	
 	uart_sendbuf[36] = 0x01;
 	uart_sendbuf[37] = 0x00;
@@ -1110,10 +1136,15 @@ void ble_mode_cmd_U(void)
 	uart_sendbuf[44] = 0x19;
 	uart_sendbuf[45] = 0x1F;
 	
-	//uart_sendbuf[46] = 0xC5;
-	uart_sendbuf[46] = 0xC6;
-	uart_sendbuf[47] = 0x0D;
-	uart_sendbuf[48] = 0x0A;	
+//	uart_sendbuf[46] = 0xC5;	
+//	uart_sendbuf[47] = 0x0D;
+//	uart_sendbuf[48] = 0x0A;
+
+	for (i = 0; i < uart_sendbuf[1] - 3; i++)
+		uart_sendbuf[uart_sendbuf[1] - 3] +=
+			uart_sendbuf[i];
+	uart_sendbuf[uart_sendbuf[1] - 2] = 0x0D;
+	uart_sendbuf[uart_sendbuf[1] - 1] = 0x0A;
 	
 	bufhead = 0;
 	PutString(uart_sendbuf[1]);
