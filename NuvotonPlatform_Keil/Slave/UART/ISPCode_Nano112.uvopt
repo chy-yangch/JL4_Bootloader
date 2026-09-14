@@ -142,9 +142,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>757</LineNumber>
+          <LineNumber>526</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>1798</Address>
+          <Address>2894</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -153,14 +153,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\757</Expression>
+          <Expression>\\JL4_Bootloader_NewPCA_V3\Main.c\526</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>710</LineNumber>
+          <LineNumber>476</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>1714</Address>
+          <Address>2872</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -169,71 +169,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\Main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\710</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>479</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>3262</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\479</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>472</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>3274</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\472</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>501</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>3342</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\501</Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>512</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>3348</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\JL4_Bootloader_V2\Main.c\512</Expression>
+          <Expression>\\JL4_Bootloader_NewPCA_V3\Main.c\476</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -311,6 +247,21 @@
           <count>14</count>
           <WinNumber>1</WinNumber>
           <ItemText>((RTC_T *) (((uint32_t)0x40000000) + 0x08000))</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart_rcvbuf</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>bufhead</ItemText>
+        </Ww>
+        <Ww>
+          <count>17</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>led_tt</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

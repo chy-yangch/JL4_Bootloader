@@ -77,7 +77,7 @@ void SYS_Init (void);
 void ble_ota_io_init(void);
 void ble_mode_cmd_m(void);
 void ble_ota_step_function (void);
-
+void ble_mode_cmd_U(void);
 
 static uint8_t volatile	bufhead;
 static uint8_t volatile	g_connStatus;
@@ -463,15 +463,19 @@ int32_t main()
 
 	//PD->DOUT |= BIT10;	//R
 	RED_LED = 1;
-	if((!POW_KEY) && (OTHER_KEY)) {
-	//if (1) {
+	//if((!POW_KEY) && (OTHER_KEY)) {
+	if (1) {
 
 _CHECK_ERR:
 		
 		while (1) {
 			ble_ota_step_function();
-			if (ble_ota_step == 4)
+			//if (ble_ota_step == 4)
+			if (BLE_STATUS) {
+				RED_LED = 0;
 				goto _ISP;
+				
+			}
 		}
 	} else {
 		
@@ -878,6 +882,7 @@ void ble_mode_cmd_m(void)
 	uint32_t u32;
 	
 	BLE_wakeup();
+
 	for (i = 0; i < 10; i++)
 		uart_sendbuf[i] = 0;
 
@@ -933,10 +938,11 @@ uint8_t wait_cmd_m_ack(void)
 {
 	uint8_t ack;
 	
-	if (bUartDataReady == TRUE && uart_rcvbuf[2] == 'M') {
+	//if (bUartDataReady == TRUE && uart_rcvbuf[2] == 'M') {
+	if (bUartDataReady == TRUE && uart_rcvbuf[2] == 'U') {
 		bUartDataReady = FALSE;
 		ack = 1;
-		BLE_WAKEUP = 1;
+		//BLE_WAKEUP = 1;
 	} else {
 		ack = 0;
 	}
@@ -999,21 +1005,23 @@ void ble_ota_step_function (void)
 			break;
 		
 		case 1:
-			ble_mode_cmd_m();
+			ble_mode_cmd_U();
+			//ble_mode_cmd_m();
 			ble_ota_step = 2;
 			ble_ota_cmd_retry_cnt = 0;
 			break;
 		
 		case 2:
 				
-			if (ble_ota_cmd_retry_cnt > 3) {
+			if (ble_ota_cmd_retry_cnt > 2) {
 				
-				ble_ota_step = 2;
+				ble_ota_step = 1;
 
 			} else  {
 		
-				if (wait_cmd_m_ack())
-					ble_ota_step = 3;
+//				if (wait_cmd_m_ack())
+//					//ble_ota_step = 3;
+//					ble_ota_step = 1;
 			}
 			
 			break;
@@ -1033,3 +1041,83 @@ void ble_ota_step_function (void)
 	}
 
 }
+
+void ble_mode_cmd_U(void)
+{
+	uint8_t i,*ptr;
+	uint32_t u32;
+	
+	BLE_wakeup();
+
+	for (i = 0; i < 64; i++)
+		uart_sendbuf[i] = 0;
+
+//23 31 55 1C FF 46 50 42 47 17 04 00 03 04 20 17 04 06 EC 14 BB 05 ED 14 5B 14 10 01 00 0D 13 28 00 00 41 41 01 00 00 00 00 2C 01 0E 19 1F C5 0D 0A
+	
+	uart_sendbuf[0] = 0x23;
+	uart_sendbuf[1] = 0x31;
+	uart_sendbuf[2] = 'U';
+	uart_sendbuf[3] = 0x1C;
+	uart_sendbuf[4] = 0xFF;
+
+	
+	uart_sendbuf[5] = 0x46;	//F
+	uart_sendbuf[6] = 0x50;	//P
+	uart_sendbuf[7] = 0x42;	//B
+	uart_sendbuf[8] = 0x47;	//G
+	
+	
+	uart_sendbuf[9] = 0x17;	//Year
+	uart_sendbuf[10] = 0x04;	//month
+	uart_sendbuf[11] = 0x00;	//hour
+	//uart_sendbuf[12] = 0x03;	//min
+	uart_sendbuf[12] = 0x04;	//min
+	
+	
+	uart_sendbuf[13] = 0x04;
+	uart_sendbuf[14] = 0x20;
+	uart_sendbuf[15] = 0x17;
+	uart_sendbuf[16] = 0x04;	
+	uart_sendbuf[17] = 0x06;
+	uart_sendbuf[18] = 0xEC;
+	uart_sendbuf[19] = 0x14;
+	uart_sendbuf[20] = 0xBB;
+	uart_sendbuf[21] = 0x05;
+	uart_sendbuf[22] = 0xED;
+	uart_sendbuf[23] = 0x14;
+	uart_sendbuf[24] = 0x5B;
+	uart_sendbuf[25] = 0x14;
+	uart_sendbuf[26] = 0x10;
+	uart_sendbuf[27] = 0x01;
+	uart_sendbuf[28] = 0x00;
+	uart_sendbuf[29] = 0x0D;
+	uart_sendbuf[30] = 0x13;
+	uart_sendbuf[31] = 0x28;
+	uart_sendbuf[32] = 0x00;
+	uart_sendbuf[33] = 0x00;
+	
+	uart_sendbuf[34] = 'A';
+	uart_sendbuf[35] = 'A';
+	
+	uart_sendbuf[36] = 0x01;
+	uart_sendbuf[37] = 0x00;
+	uart_sendbuf[38] = 0x00;
+	uart_sendbuf[39] = 0x00;
+	uart_sendbuf[40] = 0x00;
+	uart_sendbuf[41] = 0x2C;
+	uart_sendbuf[42] = 0x01;
+	uart_sendbuf[43] = 0x0E;
+	uart_sendbuf[44] = 0x19;
+	uart_sendbuf[45] = 0x1F;
+	
+	//uart_sendbuf[46] = 0xC5;
+	uart_sendbuf[46] = 0xC6;
+	uart_sendbuf[47] = 0x0D;
+	uart_sendbuf[48] = 0x0A;	
+	
+	bufhead = 0;
+	PutString(uart_sendbuf[1]);
+	BLE_sleep();		
+
+}
+
