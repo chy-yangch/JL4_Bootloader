@@ -50,12 +50,13 @@
 #define CONNECTED		2
 
 // BLE
-#define BLE_EN                  	PC4
-#define BLE_STATUS         	PC5
-#define BLE_WAKEUP       	PC6
+#define BLE_EN				PC4  //==> JL4 BLE_OTA_ACTIVE (Input)
+#define BLE_STATUS			PC5  //==> JL4 BLE_CHY_GATT_ACTIVE (Input)
+#define BLE_WAKEUP			PC6  //==> JL4 BLE_WAKE_UP (Output)
+#define BLE_NRST				PC3  //==> JL4 BLE_NRST(Output)
 
 // LED
-#define BLUE_LED		PD9
+#define BLUE_LED			PD9
 #define RED_LED			PD10
 #define GREEN_LED		PD13
 
@@ -68,6 +69,11 @@
 //KEY
 #define POW_KEY			PA3
 #define OTHER_KEY		PB15
+
+//POWER SW
+#define VB_EN_PIIN	PB12
+#define BLE_EN_PIN	PC9
+
 
 void Delay(uint32_t delayCnt);
 void SysTimerDelay(uint32_t us);
@@ -690,7 +696,10 @@ void SYS_Init (void)
 	CLK->CLKSEL1  |= CLK_CLKSEL1_LCD_S_LIRC + CLK_CLKSEL1_TMR0_S_HIRC;
 	CLK->APBCLK   |= CLK_APBCLK_LCD_EN + CLK_APBCLK_TMR0_EN + CLK_APBCLK_TMR1_EN|CLK_APBCLK_SPI1_EN | CLK_APBCLK_RTC_EN;
 
-	PB->PMD |= 0x01000000;	
+	PB->PMD |= 0x01000000;
+	
+	VB_EN_PIIN = 1;
+	
     #if defined(JL4PR)
 	PA->DOUT = 0x00000000;
 	SYS->PA_H_MFP =	0x00000000;
@@ -719,10 +728,13 @@ void SYS_Init (void)
 	PC->DOUT = 0x00004000;//0x00000050;
 	SYS->PC_H_MFP = 0x00000000;//0x00000007;
 	//SYS->PC_L_MFP = 0x00000000;//0x70000000;
-	PC->PMD  = 0x15555505;//0x15540005;//0x15541105;//0x15551105;//0x10001500; 
+	PC->PMD  = 0x15555045;// PC2,4,5,15 are Input other Output
 	//PC->OFFD = 0x00000000;
 	//PC->PUEN = 0x00000000;
-		
+	
+	BLE_EN_PIN = 0;
+	BLE_NRST = 1;
+
     #elif defined(JL4PC)
 	PA->DOUT = 0x00000000;
 	SYS->PA_H_MFP =	0x00000000;
@@ -843,8 +855,8 @@ void ble_ota_io_init(void)
 		
 	#elif defined(JL4RH)
 		
-		PC->DOUT = 0x00000050;
-		PC->PMD  = 0x10001100;
+		PC->DOUT = 0x00000048; // PC3,6 are Output 1
+		PC->PMD  = 0x10041040; //PC3,6,9,14 are Output other Input
 		CLK_SysTickDelay(500000); // 5 us
 
 		SYS->PC_H_MFP = 0x00000007;
@@ -860,7 +872,7 @@ void ble_ota_io_init(void)
 		SYS->PC_L_MFP = 0x70000003;
 		PC->DOUT |= BIT6;
 		PC->OFFD = 0x00000000;
-		PC->PUEN = 0x00000000;					
+		PC->PUEN = 0x00000000;
 	#else
 	 __NOP();
 	 __NOP();
