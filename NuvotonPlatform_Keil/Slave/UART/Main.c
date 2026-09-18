@@ -469,7 +469,7 @@ int32_t main()
 	//RTC_SPR(2) = 0x00000055;
 
 	//PD->DOUT |= BIT10;	//R
-	RED_LED = 1;
+	//RED_LED = 1;
 	if((!POW_KEY) && (OTHER_KEY)) {
 	//if (1) {
 
@@ -498,6 +498,7 @@ _CHECK_ERR:
 			
 			GREEN_LED = 1;
 			BLUE_LED = 1;
+			RED_LED = 1;
 			
 			bin_to_approm();
 
